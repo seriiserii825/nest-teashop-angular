@@ -22,7 +22,7 @@ export class User {
   @Column({ default: '/uploads/no-user-image.jpg' })
   picture: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   password: string | null;
 
   @OneToMany(() => Store, (store) => store.user)

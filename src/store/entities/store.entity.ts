@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -8,6 +9,7 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity.js';
 
+@Entity('stores')
 export class Store {
   @PrimaryGeneratedColumn('uuid')
   id: string;
