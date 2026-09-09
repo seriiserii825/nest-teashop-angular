@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Store } from '../../store/entities/store.entity.js';
 
 @Entity('users')
 export class User {
@@ -22,6 +24,9 @@ export class User {
 
   @Column({ nullable: true })
   password: string | null;
+
+  @OneToMany(() => Store, (store) => store.user)
+  stores: Store[];
 
   @UpdateDateColumn()
   updatedAt: Date;
