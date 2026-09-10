@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { Store } from '../../store/entities/store.entity.js';
+import { Review } from '../../review/entities/review.entity.js';
 
 @Entity('users')
 export class User {
@@ -28,6 +29,9 @@ export class User {
 
   @OneToMany(() => Store, (store) => store.user)
   stores: Relation<Store[]>;
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Relation<Review[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;
