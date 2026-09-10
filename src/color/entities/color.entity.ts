@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -12,16 +11,15 @@ import type { Relation } from 'typeorm';
 import { Product } from '../../product/entities/product.entity.js';
 import { Store } from '../../store/entities/store.entity.js';
 
-@Entity('categories')
-export class Category {
+export class Color {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })
-  title: string;
+  name: string;
 
   @Column()
-  description: string;
+  value: string;
 
   @OneToMany(() => Product, (product) => product.category)
   products: Product[];

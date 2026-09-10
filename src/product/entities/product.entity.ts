@@ -10,6 +10,7 @@ import {
 import type { Relation } from 'typeorm';
 import { Store } from '../../store/entities/store.entity.js';
 import { Category } from '../../category/entities/category.entity.js';
+import { Color } from '../../color/entities/color.entity.js';
 
 @Entity('products')
 export class Product {
@@ -43,6 +44,15 @@ export class Product {
 
   @Column()
   categoryId: string;
+
+  @ManyToOne(() => Color, (color) => color.products, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'colorId' })
+  color: Relation<Color>;
+
+  @Column()
+  colorId: string;
 
   @UpdateDateColumn()
   updatedAt: Date;

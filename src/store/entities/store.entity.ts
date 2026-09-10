@@ -12,6 +12,7 @@ import type { Relation } from 'typeorm';
 import { User } from '../../user/entities/user.entity.js';
 import { Product } from '../../product/entities/product.entity.js';
 import { Category } from '../../category/entities/category.entity.js';
+import { Color } from '../../color/entities/color.entity.js';
 
 @Entity('stores')
 export class Store {
@@ -36,6 +37,9 @@ export class Store {
 
   @OneToMany(() => Category, (category) => category.store)
   categories: Relation<Category[]>;
+
+  @OneToMany(() => Color, (color) => color.store)
+  colors: Relation<Color[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;
