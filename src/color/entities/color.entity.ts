@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -11,6 +12,7 @@ import type { Relation } from 'typeorm';
 import { Product } from '../../product/entities/product.entity.js';
 import { Store } from '../../store/entities/store.entity.js';
 
+@Entity('colors')
 export class Color {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -21,8 +23,8 @@ export class Color {
   @Column()
   value: string;
 
-  @OneToMany(() => Product, (product) => product.category)
-  products: Product[];
+  @OneToMany(() => Product, (product) => product.color)
+  products: Relation<Product[]>;
 
   @ManyToOne(() => Store, (store) => store.categories, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'storeId' })

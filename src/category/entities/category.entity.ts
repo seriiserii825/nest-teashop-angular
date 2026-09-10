@@ -24,7 +24,7 @@ export class Category {
   description: string;
 
   @OneToMany(() => Product, (product) => product.category)
-  products: Product[];
+  products: Relation<Product[]>;
 
   @ManyToOne(() => Store, (store) => store.categories, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'storeId' })
