@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { Store } from '../../store/entities/store.entity.js';
 
 @Entity('users')
@@ -26,7 +27,7 @@ export class User {
   password: string | null;
 
   @OneToMany(() => Store, (store) => store.user)
-  stores: Store[];
+  stores: Relation<Store[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;

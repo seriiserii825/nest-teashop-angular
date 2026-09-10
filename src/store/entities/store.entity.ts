@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import type { Relation } from 'typeorm';
 import { User } from '../../user/entities/user.entity.js';
 import { Product } from '../../product/entities/product.entity.js';
 
@@ -24,13 +25,13 @@ export class Store {
 
   @ManyToOne(() => User, (user) => user.stores, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user: Relation<User>;
 
   @Column()
   userId: string;
 
   @OneToMany(() => Product, (product) => product.store)
-  products: Product[];
+  products: Relation<Product[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;
