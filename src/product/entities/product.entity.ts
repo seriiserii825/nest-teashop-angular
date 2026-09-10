@@ -11,6 +11,7 @@ import type { Relation } from 'typeorm';
 import { Store } from '../../store/entities/store.entity.js';
 import { Category } from '../../category/entities/category.entity.js';
 import { Color } from '../../color/entities/color.entity.js';
+import { User } from '../../user/entities/user.entity.js';
 
 @Entity('products')
 export class Product {
@@ -44,6 +45,15 @@ export class Product {
 
   @Column()
   categoryId: string;
+
+  @ManyToOne(() => User, (user) => user.favorites, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'userId' })
+  user: Relation<User>;
+
+  @Column()
+  userId: string;
 
   @ManyToOne(() => Color, (color) => color.products, {
     onDelete: 'CASCADE',

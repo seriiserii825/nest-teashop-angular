@@ -9,6 +9,7 @@ import {
 import type { Relation } from 'typeorm';
 import { Store } from '../../store/entities/store.entity.js';
 import { Review } from '../../review/entities/review.entity.js';
+import { Product } from '../../product/entities/product.entity.js';
 
 @Entity('users')
 export class User {
@@ -32,6 +33,9 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Relation<Review[]>;
+
+  @OneToMany(() => Product, (product) => product.id)
+  favorites: Product[];
 
   @UpdateDateColumn()
   updatedAt: Date;
