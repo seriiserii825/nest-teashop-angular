@@ -4,6 +4,7 @@
 /build
 bun.lock
 package-lock.json
+tsconfig.build.tsbuildinfo
 
 # Logs
 logs
