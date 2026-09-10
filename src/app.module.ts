@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module.js';
 import { StoreModule } from './store/store.module.js';
 import { databaseConfig } from './database.config.js';
 import { ProductModule } from './product/product.module.js';
+import { CategoryModule } from './category/category.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,6 +18,7 @@ import { ProductModule } from './product/product.module.js';
     UserModule,
     StoreModule,
     ProductModule,
+    CategoryModule,
   ],
 })
 export class AppModule {}
