@@ -26,7 +26,7 @@ export class Color {
   @OneToMany(() => Product, (product) => product.color)
   products: Relation<Product[]>;
 
-  @ManyToOne(() => Store, (store) => store.categories, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Store, (store) => store.colors, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'storeId' })
   store: Relation<Store>;
 

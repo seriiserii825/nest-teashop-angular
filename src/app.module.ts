@@ -8,6 +8,8 @@ import { ProductModule } from './product/product.module.js';
 import { CategoryModule } from './category/category.module.js';
 import { ColorModule } from './color/color.module.js';
 import { ReviewModule } from './review/review.module.js';
+import { OrderModule } from './order/order.module.js';
+import { OrderItemModule } from './order-item/order-item.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,6 +25,8 @@ import { ReviewModule } from './review/review.module.js';
     CategoryModule,
     ColorModule,
     ReviewModule,
+    OrderModule,
+    OrderItemModule,
   ],
 })
 export class AppModule {}

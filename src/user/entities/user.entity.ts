@@ -34,8 +34,8 @@ export class User {
   @OneToMany(() => Review, (review) => review.user)
   reviews: Relation<Review[]>;
 
-  @OneToMany(() => Product, (product) => product.id)
-  favorites: Product[];
+  @OneToMany(() => Product, (product) => product.user)
+  favorites: Relation<Product[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;

@@ -30,14 +30,16 @@ export class Review {
   @Column()
   userId: string;
 
-  @ManyToOne(() => Product, (product) => product.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Product, (product) => product.reviews, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'productId' })
   product: Relation<Product>;
 
   @Column()
   productId: string;
 
-  @ManyToOne(() => Store, (store) => store.id, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Store, (store) => store.reviews, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'storeId' })
   store: Relation<Store>;
 
