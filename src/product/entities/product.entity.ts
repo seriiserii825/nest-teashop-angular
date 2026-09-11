@@ -1,16 +1,18 @@
+import type { Relation } from 'typeorm';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import type { Relation } from 'typeorm';
-import { Store } from '../../store/entities/store.entity.js';
 import { Category } from '../../category/entities/category.entity.js';
 import { Color } from '../../color/entities/color.entity.js';
+import { Review } from '../../review/entities/review.entity.js';
+import { Store } from '../../store/entities/store.entity.js';
 import { User } from '../../user/entities/user.entity.js';
 
 @Entity('products')
@@ -63,6 +65,9 @@ export class Product {
 
   @Column()
   colorId: string;
+
+  @OneToMany(() => Review, (review) => review.product)
+  reviews: Relation<Review[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;

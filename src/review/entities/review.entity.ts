@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import type { Relation } from 'typeorm';
 import { User } from '../../user/entities/user.entity.js';
+import { Product } from '../../product/entities/product.entity.js';
 
 @Entity('reviews')
 export class Review {
@@ -27,6 +28,13 @@ export class Review {
 
   @Column()
   userId: string;
+
+  @ManyToOne(() => Product, (product) => product.id, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'productId' })
+  product: Relation<Product>;
+
+  @Column()
+  productId: string;
 
   @UpdateDateColumn()
   updatedAt: Date;
