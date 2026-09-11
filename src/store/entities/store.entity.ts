@@ -1,3 +1,4 @@
+import type { Relation } from 'typeorm';
 import {
   Column,
   CreateDateColumn,
@@ -8,11 +9,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import type { Relation } from 'typeorm';
-import { User } from '../../user/entities/user.entity.js';
-import { Product } from '../../product/entities/product.entity.js';
 import { Category } from '../../category/entities/category.entity.js';
 import { Color } from '../../color/entities/color.entity.js';
+import { Product } from '../../product/entities/product.entity.js';
+import { Review } from '../../review/entities/review.entity.js';
+import { User } from '../../user/entities/user.entity.js';
 
 @Entity('stores')
 export class Store {
@@ -40,6 +41,9 @@ export class Store {
 
   @OneToMany(() => Color, (color) => color.store)
   colors: Relation<Color[]>;
+
+  @OneToMany(() => Review, (review) => review.store)
+  reviews: Relation<Review[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;
