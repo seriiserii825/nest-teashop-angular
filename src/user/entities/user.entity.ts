@@ -1,15 +1,16 @@
+import type { Relation } from 'typeorm';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import type { Relation } from 'typeorm';
-import { Store } from '../../store/entities/store.entity.js';
-import { Review } from '../../review/entities/review.entity.js';
+import { Order } from '../../order/entities/order.entity.js';
 import { Product } from '../../product/entities/product.entity.js';
+import { Review } from '../../review/entities/review.entity.js';
+import { Store } from '../../store/entities/store.entity.js';
 
 @Entity('users')
 export class User {
@@ -36,6 +37,11 @@ export class User {
 
   @OneToMany(() => Product, (product) => product.user)
   favorites: Relation<Product[]>;
+
+  @OneToMany(() => Order, (order) => order.user, {
+    cascade: true,
+  })
+  orders: Relation<Order[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;
