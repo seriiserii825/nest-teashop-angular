@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Order } from '../../order/entities/order.entity.js';
 import { Product } from '../../product/entities/product.entity.js';
+import { Store } from '../../store/entities/store.entity.js';
 
 @Entity('order_items')
 export class OrderItem {
@@ -36,6 +37,15 @@ export class OrderItem {
   })
   @JoinColumn({ name: 'productId' })
   product: Relation<Product>;
+
+  @ManyToOne(() => Store, (store) => store.order_items, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'storeId' })
+  store: Relation<Store>;
+
+  @Column()
+  storeId: string;
 
   @Column()
   productId: string;
