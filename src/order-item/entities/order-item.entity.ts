@@ -1,3 +1,4 @@
+import type { Relation } from 'typeorm';
 import {
   Column,
   CreateDateColumn,
@@ -8,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Order } from '../../order/entities/order.entity.js';
-import type { Relation } from 'typeorm';
+import { Product } from '../../product/entities/product.entity.js';
 
 @Entity('order_items')
 export class OrderItem {
@@ -23,6 +24,21 @@ export class OrderItem {
 
   @Column()
   orderId: string;
+
+  @Column()
+  quantity: number;
+
+  @Column()
+  price: number;
+
+  @ManyToOne(() => Product, (product) => product.order_items, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'productId' })
+  product: Relation<Product>;
+
+  @Column()
+  productId: string;
 
   @UpdateDateColumn()
   updatedAt: Date;

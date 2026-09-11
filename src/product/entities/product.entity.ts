@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { Category } from '../../category/entities/category.entity.js';
 import { Color } from '../../color/entities/color.entity.js';
+import { OrderItem } from '../../order-item/entities/order-item.entity.js';
 import { Review } from '../../review/entities/review.entity.js';
 import { Store } from '../../store/entities/store.entity.js';
 import { User } from '../../user/entities/user.entity.js';
@@ -68,6 +69,11 @@ export class Product {
 
   @OneToMany(() => Review, (review) => review.product)
   reviews: Relation<Review[]>;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.orderId, {
+    cascade: true,
+  })
+  order_items: Relation<OrderItem[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;
