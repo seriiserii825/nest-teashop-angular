@@ -31,6 +31,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
+    return user;
   }
 
   async findByEmail(email: string) {
@@ -41,13 +42,14 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User with email ${email} not found`);
     }
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} user`;
   }
 }
