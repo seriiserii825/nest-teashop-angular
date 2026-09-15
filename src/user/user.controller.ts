@@ -25,6 +25,15 @@ export class UserController {
     return user;
   }
 
+  @Auth()
+  @Patch('profile/favorites/:productId')
+  async toggleFavorite(
+    @CurrentUser('id') userId: string,
+    @Param('productId') productId: string,
+  ) {
+    return this.userService.toggleFavoriteProduct(userId, productId);
+  }
+
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
