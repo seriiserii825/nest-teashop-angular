@@ -55,4 +55,11 @@ export class AuthController {
     this.authService.addRefreshTokenToResponse(res, refreshToken);
     return response;
   }
+
+  @HttpCode(200)
+  @Post('logout')
+  async logout(@Res({ passthrough: true }) res: Response) {
+    this.authService.removeRefreshTokenFromResponse(res);
+    return { message: 'Logged out successfully' };
+  }
 }
