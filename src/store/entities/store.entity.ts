@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { Category } from '../../category/entities/category.entity.js';
@@ -17,11 +18,12 @@ import { Review } from '../../review/entities/review.entity.js';
 import { User } from '../../user/entities/user.entity.js';
 
 @Entity('stores')
+@Unique(['userId', 'title'])
 export class Store {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column()
   title: string;
 
   @Column()

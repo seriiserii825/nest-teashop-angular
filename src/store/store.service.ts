@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateStoreDto } from './dto/create-store.dto.js';
@@ -12,12 +16,38 @@ export class StoreService {
     private readonly storeRepository: Repository<Store>,
   ) {}
 
-  create(createStoreDto: CreateStoreDto) {
-    return 'This action adds a new store';
+  async create(userId: string, dto: CreateStoreDto) {
+    const existingStore = await this.storeRepository.findOne({
+      where: { userId, title: dto.title },
+    });
+    if (existingStore) {
+      throw new BadRequestException(
+        `Store with title ${dto.title} already exists for this user`,
+      );
+    }
+    const store = this.storeRepository.create({ ...dto, userId });
+    return this.storeRepository.save(store);
   }
 
-  findAll() {
-    return `This action returns all store`;
+  async update(userId: string, storeId: string, dto: UpdateStoreDto) {
+    const store = await this.findOne(storeId, userId);
+    if (dto.title && dto.title !== store.title) {
+      const existingStore = await this.storeRepository.findOne({
+        where: { userId, title: dto.title },
+      });
+      if (existingStore) {
+        throw new BadRequestException(
+          `Store with title ${dto.title} already exists for this user`,
+        );
+      }
+    }
+    Object.assign(store, dto);
+    return this.storeRepository.save(store);
+  }
+
+  async remove(userId: string, storeId: string) {
+    const store = await this.findOne(storeId, userId);
+    return this.storeRepository.remove(store);
   }
 
   async findOne(storeId: string, userId: string) {
@@ -33,11 +63,10 @@ export class StoreService {
     return store;
   }
 
-  update(id: number, updateStoreDto: UpdateStoreDto) {
-    return `This action updates a #${id} store`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} store`;
+  async findAll(userId: string) {
+    return this.storeRepository.find({
+      where: { userId },
+      relations: { products: true, reviews: true },
+    });
   }
 }
