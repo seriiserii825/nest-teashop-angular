@@ -1,19 +1,26 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Post,
   Req,
   Res,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service.js';
 import { AuthDto } from './dto/auth.dto.js';
+import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @HttpCode(200)
   @Post('login')
@@ -61,5 +68,26 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     this.authService.removeRefreshTokenFromResponse(res);
     return { message: 'Logged out successfully' };
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req: Request) {
+    // Initiates the Google OAuth2 login flow
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { refreshToken, ...response } =
+      await this.authService.validateOAuthLogin(req);
+    this.authService.addRefreshTokenToResponse(res, refreshToken);
+
+    return res.redirect(
+      `${this.configService.get('CLIENT_URL')}/dashboard?accessToken=${response.accessToken}`,
+    );
   }
 }
