@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { hash } from 'argon2';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto.js';
+import { AuthDto } from '../auth/dto/auth.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { User } from './entities/user.entity.js';
-import { hash } from 'argon2';
 
 @Injectable()
 export class UserService {
@@ -12,11 +12,12 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
-  async create(dto: CreateUserDto) {
-    this.userRepository.save({
+  async create(dto: AuthDto) {
+    const user = await this.userRepository.save({
       ...dto,
       password: await hash(dto.password),
     });
+    return user;
   }
 
   findAll() {
