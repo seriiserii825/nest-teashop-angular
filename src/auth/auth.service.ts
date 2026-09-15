@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './dto/auth.dto.js';
 import { Response } from 'express';
 import { User } from '../user/entities/user.entity.js';
+import ms from 'ms';
 
 interface Tokens {
   accessToken: string;
@@ -23,17 +24,12 @@ interface AuthResult extends Tokens {
 @Injectable()
 export class AuthService {
   REFRESH_TOKEN_NAME = 'refreshToken';
-  EXPIRE_DAY_REFRESH_TOKEN: string;
 
   constructor(
     private jwt: JwtService,
     private userService: UserService,
     private configService: ConfigService,
-  ) {
-    this.EXPIRE_DAY_REFRESH_TOKEN = this.configService.getOrThrow<string>(
-      'JWT_REFRESH_EXPIRES_IN',
-    );
-  }
+  ) {}
 
   async login(dto: AuthDto): Promise<AuthResult> {
     const user = await this.validateUser(dto);
@@ -95,10 +91,9 @@ export class AuthService {
   }
 
   addRefreshTokenToResponse(res: Response, refreshToken: string): void {
-    const expiresIn = new Date();
-    const newDate =
-      expiresIn.getDate() + parseInt(this.EXPIRE_DAY_REFRESH_TOKEN);
-    expiresIn.setDate(newDate);
+    const expiresIn = new Date(
+      Date.now() + ms(this.configService.getOrThrow('JWT_REFRESH_EXPIRES_IN')),
+    );
 
     res.cookie(this.REFRESH_TOKEN_NAME, refreshToken, {
       httpOnly: true,

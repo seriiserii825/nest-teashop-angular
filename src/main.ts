@@ -12,8 +12,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: process.env.CLIENT_URL ?? 'http://localhost:5173',
-    credential: true,
-    expandHeaders: 'set-cookie',
+    credentials: true,
   });
   await app.listen(process.env.PORT ?? 3000);
 }
