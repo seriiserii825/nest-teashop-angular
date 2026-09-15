@@ -1,26 +1,29 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
 } from '@nestjs/common';
-import { UserService } from './user.service.js';
+import { ApiNotFoundResponse, ApiOkResponse } from '@nestjs/swagger';
+import { Auth } from '../auth/decorators/auth.decorator.js';
+import { CurrentUser } from './decorators/user.decorator.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
-import {
-  ApiCreatedResponse,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiParam,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { UserService } from './user.service.js';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Auth()
+  @Get('profile')
+  async getProfile(@CurrentUser('id') userId: string) {
+    const user = await this.userService.findOne(userId);
+    return user;
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
