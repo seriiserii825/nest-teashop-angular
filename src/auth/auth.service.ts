@@ -9,6 +9,16 @@ import { UserService } from '../user/user.service.js';
 import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './dto/auth.dto.js';
 import { Response } from 'express';
+import { User } from '../user/entities/user.entity.js';
+
+interface Tokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface AuthResult extends Tokens {
+  user: User;
+}
 
 @Injectable()
 export class AuthService {
@@ -25,13 +35,13 @@ export class AuthService {
     );
   }
 
-  async login(dto: AuthDto) {
+  async login(dto: AuthDto): Promise<AuthResult> {
     const user = await this.validateUser(dto);
     const tokens = this.generateTokens(user.id);
     return { user, ...tokens };
   }
 
-  async register(dto: AuthDto) {
+  async register(dto: AuthDto): Promise<AuthResult> {
     const oldUser = await this.userService.findByEmail(dto.email);
     if (oldUser) {
       throw new BadRequestException('User already exists');
@@ -41,7 +51,7 @@ export class AuthService {
     return { user, ...tokens };
   }
 
-  async getNewTokens(refreshToken: string) {
+  async getNewTokens(refreshToken: string): Promise<AuthResult> {
     const result = await this.jwt.verifyAsync(refreshToken);
     if (!result) {
       throw new UnauthorizedException('Invalid refresh token');
@@ -51,7 +61,7 @@ export class AuthService {
     return { user, ...tokens };
   }
 
-  generateTokens(userId: string) {
+  generateTokens(userId: string): Tokens {
     const data = { id: userId };
 
     const accessToken = this.jwt.sign(data, {
@@ -64,7 +74,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async validateUser(dto: AuthDto) {
+  private async validateUser(dto: AuthDto): Promise<User> {
     const user = await this.userService.findByEmail(dto.email);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -72,7 +82,7 @@ export class AuthService {
     return user;
   }
 
-  async validateOAuthLogin(req: any) {
+  async validateOAuthLogin(req: any): Promise<AuthResult> {
     let user = await this.userService.findByEmail(req.user.email);
     if (!user) {
       user = await this.userService.create({
@@ -84,7 +94,7 @@ export class AuthService {
     return { user, ...tokens };
   }
 
-  addRefreshTokenToResponse(res: Response, refreshToken: string) {
+  addRefreshTokenToResponse(res: Response, refreshToken: string): void {
     const expiresIn = new Date();
     const newDate =
       expiresIn.getDate() + parseInt(this.EXPIRE_DAY_REFRESH_TOKEN);
@@ -99,7 +109,7 @@ export class AuthService {
     });
   }
 
-  removeRefreshTokenFromResponse(res: Response) {
+  removeRefreshTokenFromResponse(res: Response): void {
     res.cookie(this.REFRESH_TOKEN_NAME, '', {
       httpOnly: true,
       domain: this.configService.getOrThrow('SERVER_DOMAIN'),
