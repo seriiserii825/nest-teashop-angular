@@ -11,6 +11,7 @@ import { ReviewModule } from './review/review.module.js';
 import { OrderModule } from './order/order.module.js';
 import { OrderItemModule } from './order-item/order-item.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { FileModule } from './file/file.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,6 +30,7 @@ import { AuthModule } from './auth/auth.module.js';
     OrderModule,
     OrderItemModule,
     AuthModule,
+    FileModule,
   ],
 })
 export class AppModule {}
