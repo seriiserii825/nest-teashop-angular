@@ -27,7 +27,7 @@ export class UserService {
   async findOne(id: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: { stores: true, favorites: true, orders: true },
+      relations: { stores: true, favorites: true, orders: true, reviews: true },
     });
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -38,7 +38,7 @@ export class UserService {
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: { email },
-      relations: { stores: true, favorites: true, orders: true },
+      relations: { stores: true, favorites: true, orders: true, reviews: true },
     });
     if (!user) {
       return null;
