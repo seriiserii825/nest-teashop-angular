@@ -15,9 +15,9 @@ export class UserService {
   async create(dto: AuthDto) {
     const user = await this.userRepository.save({
       ...dto,
-      password: await hash(dto.password),
+      password: dto.password ? await hash(dto.password) : null,
     });
-    return user;
+    return this.findOne(user.id);
   }
 
   findAll() {

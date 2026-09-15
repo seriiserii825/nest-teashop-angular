@@ -72,6 +72,18 @@ export class AuthService {
     return user;
   }
 
+  async validateOAuthLogin(req: any) {
+    let user = await this.userService.findByEmail(req.user.email);
+    if (!user) {
+      user = await this.userService.create({
+        email: req.user.email,
+        name: req.user.name,
+      });
+    }
+    const tokens = this.generateTokens(user.id);
+    return { user, ...tokens };
+  }
+
   addRefreshTokenToResponse(res: Response, refreshToken: string) {
     const expiresIn = new Date();
     const newDate =
