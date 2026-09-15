@@ -41,7 +41,7 @@ export class UserService {
       relations: { stores: true, favorites: true, orders: true },
     });
     if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
+      return null;
     }
     return user;
   }

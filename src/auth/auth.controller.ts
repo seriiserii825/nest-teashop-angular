@@ -11,7 +11,6 @@ export class AuthController {
   async login(@Body() dto: AuthDto) {
     return this.authService.login(dto);
   }
-
   @HttpCode(201)
   @Post('register')
   async register(@Body() dto: AuthDto) {
