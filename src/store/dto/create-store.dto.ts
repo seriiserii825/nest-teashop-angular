@@ -1,1 +1,4 @@
-export class CreateStoreDto {}
+export class CreateStoreDto {
+  title: string;
+  description: string;
+}

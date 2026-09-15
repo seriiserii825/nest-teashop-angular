@@ -21,10 +21,10 @@ export class Store {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
   title: string;
 
-  @Column({ unique: true })
+  @Column()
   description: string;
 
   @ManyToOne(() => User, (user) => user.stores, { onDelete: 'CASCADE' })
