@@ -33,7 +33,7 @@ Complete all the required steps and finish the OAuth consent screen configuratio
 
 ## 4. Create OAuth Credentials
 
-Go to:
+Go to api:
 
 **APIs & Services → Credentials**
 
