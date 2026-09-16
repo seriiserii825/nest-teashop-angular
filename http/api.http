@@ -1,0 +1,118 @@
+### Register (run once, then use login below)
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+> {%
+  client.log("login status: " + response.status);
+  client.log("login raw body: " + response.body);
+
+  client.test("login succeeded", function () {
+    client.assert(response.status === 200, "expected 200, got " + response.status);
+  });
+
+  if (response.json) {
+    client.global.accessToken = response.json.accessToken;
+    client.global.userId = response.json.user.id;
+  }
+%}
+
+### Create store
+# @name createStore
+POST {{baseUrl}}/store
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "My Store",
+  "description": "Test store created from kulala"
+}
+
+> {%
+  client.global.storeId = response.json.id;
+
+  client.test("store created", function () {
+    client.assert(response.status === 201, "expected 201, got " + response.status);
+    client.assert(!!response.json.id, "expected store id in response");
+  });
+%}
+
+### Find all stores
+GET {{baseUrl}}/store
+Authorization: Bearer {{accessToken}}
+
+### Find one store
+GET {{baseUrl}}/store/{{storeId}}
+Authorization: Bearer {{accessToken}}
+
+### Create category
+# @name createCategory
+POST {{baseUrl}}/category/store/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Electronics",
+  "description": "Electronic products"
+}
+
+> {%
+  client.global.categoryId = response.json.id;
+%}
+
+### Create color
+# @name createColor
+POST {{baseUrl}}/color/store/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Red",
+  "value": "#ff0000"
+}
+
+> {%
+  client.global.colorId = response.json.id;
+
+  client.test("color created", function () {
+    client.assert(response.status === 201, "expected 201, got " + response.status);
+  });
+%}
+
+### Find all colors for store
+GET {{baseUrl}}/color/store/{{storeId}}
+Authorization: Bearer {{accessToken}}
+
+### Get one color
+GET {{baseUrl}}/color/store/{{storeId}}/color/{{colorId}}
+Authorization: Bearer {{accessToken}}
+
+### Update color
+PATCH {{baseUrl}}/color/store/{{storeId}}/color/{{colorId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Dark Red",
+  "value": "#8b0000"
+}
+
+### Delete color
+DELETE {{baseUrl}}/color/store/{{storeId}}/color/{{colorId}}
+Authorization: Bearer {{accessToken}}
