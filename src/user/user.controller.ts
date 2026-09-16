@@ -13,6 +13,7 @@ import { CurrentUser } from './decorators/user.decorator.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 import { UserService } from './user.service.js';
+import { User } from './entities/user.entity.js';
 
 @Controller('user')
 export class UserController {
@@ -39,8 +40,9 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  @Auth()
   @Get()
-  findAll() {
+  findAll(): Promise<User[]> {
     return this.userService.findAll();
   }
 

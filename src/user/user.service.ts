@@ -21,8 +21,10 @@ export class UserService {
     return this.findOne(user.id);
   }
 
-  findAll(): string {
-    return `This action returns all user`;
+  findAll(): Promise<User[]> {
+    return this.userRepository.find({
+      relations: { stores: true, favorites: true, orders: true, reviews: true },
+    });
   }
 
   async findOne(id: string): Promise<User> {
