@@ -4,44 +4,89 @@ import { Repository } from 'typeorm';
 import { CreateColorDto } from './dto/create-color.dto.js';
 import { UpdateColorDto } from './dto/update-color.dto.js';
 import { Color } from './entities/color.entity.js';
+import { StoreService } from '../store/store.service.js';
 
 @Injectable()
 export class ColorService {
   constructor(
     @InjectRepository(Color)
     private readonly colorRepository: Repository<Color>,
+    private readonly storeService: StoreService,
   ) {}
 
-  async getByStoreId(storeId: string, colorId: string): Promise<Color[]> {
-    return this.colorRepository.find({ where: { storeId, id: colorId } });
+  async getByStoreId(
+    userId: string,
+    storeId: string,
+    colorId: string,
+  ): Promise<Color> {
+    await this.storeService.findOne(storeId, userId);
+    const color = await this.colorRepository.findOne({
+      where: { id: colorId, storeId },
+      relations: { store: true },
+    });
+    if (!color) {
+      throw new BadRequestException(
+        `Color with id ${colorId} not found for store ${storeId}`,
+      );
+    }
+    return color;
   }
 
-  async create(storeId: string, dto: CreateColorDto) {
-    const existingStore = await this.colorRepository.findOne({
+  async create(userId: string, storeId: string, dto: CreateColorDto) {
+    await this.storeService.findOne(storeId, userId);
+    const existingColor = await this.colorRepository.findOne({
       where: { storeId, name: dto.name },
     });
-    if (existingStore) {
+    if (existingColor) {
       throw new BadRequestException(
-        `Store with title ${dto.name} already exists for this user`,
+        `Color with name ${dto.name} already exists for this store`,
       );
     }
     const color = this.colorRepository.create({ ...dto, storeId });
     return this.colorRepository.save(color);
   }
 
-  findAll() {
-    return this.colorRepository.find();
+  async findAll(userId: string, storeId: string) {
+    await this.storeService.findOne(storeId, userId);
+    return this.colorRepository.find({
+      where: { storeId },
+      relations: { store: true },
+    });
   }
 
-  findOne(colorId: string) {
-    return this.colorRepository.findOne({ where: { id: colorId } });
+  async update(
+    userId: string,
+    storeId: string,
+    colorId: string,
+    dto: UpdateColorDto,
+  ) {
+    await this.storeService.findOne(storeId, userId);
+    const color = await this.colorRepository.findOne({
+      where: { id: colorId, storeId },
+    });
+    if (!color) {
+      throw new BadRequestException(
+        `Color with id ${colorId} not found for store ${storeId}`,
+      );
+    }
+    await this.colorRepository.update({ id: colorId, storeId }, dto);
+    return this.colorRepository.findOne({
+      where: { id: colorId, storeId },
+      relations: { store: true },
+    });
   }
 
-  update(storeId: string, colorId: string, dto: UpdateColorDto) {
-    return this.colorRepository.update({ id: colorId, storeId }, dto);
-  }
-
-  remove(storeId: string, colorId: string) {
-    return this.colorRepository.delete({ id: colorId, storeId });
+  async remove(userId: string, storeId: string, colorId: string) {
+    await this.storeService.findOne(storeId, userId);
+    const color = await this.colorRepository.findOne({
+      where: { id: colorId, storeId },
+    });
+    if (!color) {
+      throw new BadRequestException(
+        `Color with id ${colorId} not found for store ${storeId}`,
+      );
+    }
+    await this.colorRepository.delete({ id: colorId, storeId });
+    return { message: `Color with id ${colorId} deleted successfully` };
   }
 }
