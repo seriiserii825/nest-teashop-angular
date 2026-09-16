@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import type { Relation } from 'typeorm';
@@ -13,11 +14,12 @@ import { Product } from '../../product/entities/product.entity.js';
 import { Store } from '../../store/entities/store.entity.js';
 
 @Entity('colors')
+@Unique(['storeId', 'name'])
 export class Color {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true })
+  @Column()
   name: string;
 
   @Column()

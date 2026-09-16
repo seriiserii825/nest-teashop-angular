@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ColorService } from './color.service.js';
 import { ColorController } from './color.controller.js';
+import { ColorService } from './color.service.js';
 import { Color } from './entities/color.entity.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Color])],
+  imports: [
+    TypeOrmModule.forFeature([Color]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+  ],
   controllers: [ColorController],
   providers: [ColorService],
 })
