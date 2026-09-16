@@ -1,3 +1,4 @@
+import type { Relation } from 'typeorm';
 import {
   Column,
   CreateDateColumn,
@@ -6,13 +7,14 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import type { Relation } from 'typeorm';
 import { Product } from '../../product/entities/product.entity.js';
 import { Store } from '../../store/entities/store.entity.js';
 
 @Entity('categories')
+@Unique(['storeId', 'title'])
 export class Category {
   @PrimaryGeneratedColumn('uuid')
   id: string;

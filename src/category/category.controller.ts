@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { Auth } from '../auth/decorators/auth.decorator.js';
+import { CurrentUser } from '../user/decorators/user.decorator.js';
 import { CategoryService } from './category.service.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
@@ -7,28 +17,53 @@ import { UpdateCategoryDto } from './dto/update-category.dto.js';
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  @Auth()
+  @Get('store/:storeId/category/:categoryId')
+  getByStoreId(
+    @CurrentUser('id') userId: string,
+    @Param('storeId') storeId: string,
+    @Param('categoryId') categoryId: string,
+  ) {
+    return this.categoryService.getByStoreId(userId, storeId, categoryId);
   }
 
-  @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  @Auth()
+  @Post('store/:storeId')
+  create(
+    @CurrentUser('id') userId: string,
+    @Param('storeId') storeId: string,
+    @Body() createCategoryDto: CreateCategoryDto,
+  ) {
+    return this.categoryService.create(userId, storeId, createCategoryDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  @Auth()
+  @Get('store/:storeId')
+  findAll(
+    @CurrentUser('id') userId: string,
+    @Param('storeId') storeId: string,
+  ) {
+    return this.categoryService.findAll(userId, storeId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  @Auth()
+  @Patch('store/:storeId/category/:id')
+  update(
+    @CurrentUser('id') userId: string,
+    @Param('storeId') storeId: string,
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoryService.update(userId, storeId, id, updateCategoryDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+  @Auth()
+  @Delete('store/:storeId/category/:id')
+  remove(
+    @CurrentUser('id') userId: string,
+    @Param('storeId') storeId: string,
+    @Param('id') id: string,
+  ) {
+    return this.categoryService.remove(userId, storeId, id);
   }
 }
