@@ -4,7 +4,10 @@
 
 ## Файлы
 
-- `http/api.http` — текущая коллекция запросов (auth, store, category, color). Планируется разбить на `auth.http`, `stores.http`, `color.http`.
+- `http/auth.http` — register/login (`login_serii`, `login_nixon`), пишет `accessToken`/`userId` в global.
+- `http/store.http` — CRUD стора (`createStore`, `findAllStores`, find one/update/delete), пишет `storeId`.
+- `http/category.http` — CRUD категорий (зависит от `{{storeId}}`), пишет `categoryId`.
+- `http/color.http` — CRUD цветов (зависит от `{{storeId}}`), пишет `colorId`.
 - `http/http-client.env.json` — окружение `dev` (`baseUrl`). Коммитится в git.
 - `http/http-client.private.env.json` — тестовые `email`/`password` (реальный пользователь `seriiburduja@gmail.com` / `123456`, он же в Postman-коллекции `auth`). **В `.gitignore`, не коммитится.**
 
@@ -37,7 +40,7 @@
 
 3. **`response.body`** — это уже распарсенный JS-объект/массив, если ответ JSON (НЕ строка, несмотря на то что написано в `kulala.lua-scripts.txt`). Правильный источник истины — `kulala.response-reference.txt`: *"The response body, as a string, or json object if the response is json"*. Поэтому `response.body.accessToken`, `response.body.id`, `response.body[0].id` — работают напрямую, `JSON.parse(response.body)` — **не работает** (упадёт с `Unexpected identifier "object"`, т.к. body уже объект).
 
-4. Переменные, сохранённые через `client.global.set` в одном `.http`-файле (например `login` в будущем `auth.http`), доступны через `{{name}}` в **любом другом** `.http`-файле проекта (`stores.http`, `color.http` и т.д.) — хранилище общее для всего проекта, не привязано к файлу. Нужно просто один раз выполнить `login`/`findAllStores` и т.п. в текущей сессии Neovim до того, как использовать зависимые запросы.
+4. Переменные, сохранённые через `client.global.set` в одном `.http`-файле (например `login_serii` в `auth.http`), доступны через `{{name}}` в **любом другом** `.http`-файле проекта (`store.http`, `category.http`, `color.http` и т.д.) — хранилище общее для всего проекта, не привязано к файлу. Нужно просто один раз выполнить `login_serii`/`createStore` и т.п. в текущей сессии Neovim до того, как использовать зависимые запросы.
 
 5. Диагностика: `client.log(...)` выводится не в `Verbose`, а во вкладку **Script Output (O)** в окне результата.
 
@@ -49,5 +52,5 @@
 
 ## TODO на завтра
 
-- Разбить `http/api.http` на `http/auth.http`, `http/stores.http`, `http/color.http` (категории можно добавить туда же или отдельным файлом `category.http`).
+- ~~Разбить `http/api.http` на `http/auth.http`, `http/stores.http`, `http/color.http`~~ — готово: `auth.http`, `store.http`, `category.http`, `color.http`.
 - Проверить, что `{{storeId}}`/`{{accessToken}}` корректно шарятся между новыми файлами (должно работать "из коробки", см. пункт 4 выше).

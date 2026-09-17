@@ -1,0 +1,54 @@
+### Create store
+# @name createStore
+POST {{baseUrl}}/store
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Second Store",
+  "description": "This is the second store created for testing purposes."
+}
+
+> {%
+  client.test("store created", function () {
+    client.assert(response.status === 201, "expected 201, got " + response.status);
+  });
+
+  if (response.body && response.body.id) {
+    client.global.set("storeId", response.body.id);
+  }
+%}
+
+### Find all stores
+# @name findAllStores
+GET {{baseUrl}}/store
+Authorization: Bearer {{accessToken}}
+
+> {%
+  client.test("stores list is not empty", function () {
+    client.assert(Array.isArray(response.body), "expected an array in response body");
+    client.assert(response.body.length > 0, "expected at least one store");
+  });
+
+  if (Array.isArray(response.body) && response.body.length > 0) {
+    client.global.set("storeId", response.body[0].id);
+  }
+%}
+
+### Find one store
+GET {{baseUrl}}/store/{{storeId}}
+Authorization: Bearer {{accessToken}}
+
+### Update store
+PATCH {{baseUrl}}/store/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Third store",
+  "description": "This is the third store created for testing purposes."
+}
+
+### Delete store
+DELETE {{baseUrl}}/store/{{storeId}}
+Authorization: Bearer {{accessToken}}

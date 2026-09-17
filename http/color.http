@@ -1,0 +1,49 @@
+### Create color
+# @name createColor
+POST {{baseUrl}}/color/store/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Red",
+  "value": "#ff0000"
+}
+
+> {%
+  client.test("color created", function () {
+    client.assert(response.status === 201, "expected 201, got " + response.status);
+  });
+
+  if (response.body && response.body.id) {
+    client.global.set("colorId", response.body.id);
+  }
+%}
+
+### Find all colors for store
+# @name findAllColors
+GET {{baseUrl}}/color/store/{{storeId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+  if (Array.isArray(response.body) && response.body.length > 0) {
+    client.global.set("colorId", response.body[0].id);
+  }
+%}
+
+### Get one color
+GET {{baseUrl}}/color/store/{{storeId}}/color/{{colorId}}
+Authorization: Bearer {{accessToken}}
+
+### Update color
+PATCH {{baseUrl}}/color/store/{{storeId}}/color/{{colorId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "name": "Dark Red",
+  "value": "#8b0000"
+}
+
+### Delete color
+DELETE {{baseUrl}}/color/store/{{storeId}}/color/{{colorId}}
+Authorization: Bearer {{accessToken}}

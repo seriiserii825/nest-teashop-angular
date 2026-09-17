@@ -1,0 +1,45 @@
+### Create category
+# @name createCategory
+POST {{baseUrl}}/category/store/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Technology",
+  "description": "Category for tech products"
+}
+
+> {%
+  if (response.body && response.body.id) {
+    client.global.set("categoryId", response.body.id);
+  }
+%}
+
+### Find all categories for store
+# @name findAllCategories
+GET {{baseUrl}}/category/store/{{storeId}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+  if (Array.isArray(response.body) && response.body.length > 0) {
+    client.global.set("categoryId", response.body[0].id);
+  }
+%}
+
+### Get one category
+GET {{baseUrl}}/category/store/{{storeId}}/category/{{categoryId}}
+Authorization: Bearer {{accessToken}}
+
+### Update category
+PATCH {{baseUrl}}/category/store/{{storeId}}/category/{{categoryId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Technology (updated)",
+  "description": "Updated category description"
+}
+
+### Delete category
+DELETE {{baseUrl}}/category/store/{{storeId}}/category/{{categoryId}}
+Authorization: Bearer {{accessToken}}

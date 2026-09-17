@@ -1,0 +1,52 @@
+### Register (run once, then use login below)
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Login Serii
+# @name login_serii
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email_serii}}",
+  "password": "{{password}}"
+}
+
+> {%
+  client.test("login succeeded", function () {
+    client.assert(response.status === 200, "expected 200, got " + response.status);
+  });
+
+  if (response.body && response.body.accessToken) {
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("userId", response.body.user.id);
+  }
+%}
+
+### Login Nixon
+# @name login_nixon
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email_nixon}}",
+  "password": "{{password}}"
+}
+
+> {%
+  client.test("login succeeded", function () {
+    client.assert(response.status === 200, "expected 200, got " + response.status);
+  });
+
+  if (response.body && response.body.accessToken) {
+    client.global.set("accessToken", response.body.accessToken);
+    client.global.set("userId", response.body.user.id);
+  }
+%}
