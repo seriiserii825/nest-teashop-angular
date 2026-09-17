@@ -5,10 +5,10 @@ Content-Type: multipart/form-data; boundary=----WebKitFormBoundary{{$timestamp}}
 Authorization: Bearer {{accessToken}}
 
 ------WebKitFormBoundary{{$timestamp}}
-Content-Disposition: form-data; name="files"; filename="slider.jpg"
+Content-Disposition: form-data; name="files"; filename="home-intr.jpg"
 Content-Type: image/png
 
-< /home/serii/Downloads/slider.jpg
+< /home/serii/Downloads/home-intro.jpg
 ------WebKitFormBoundary{{$timestamp}}--
 
 > {%
