@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFileDto } from './dto/create-file.dto.js';
-import { UpdateFileDto } from './dto/update-file.dto.js';
+import { IFileResponse } from './interfaces/IFileResponse.js';
+import path from 'app-root-path';
+import { ensureDir, writeFile } from 'fs-extra';
 
 @Injectable()
 export class FileService {
-  create(createFileDto: CreateFileDto) {
-    return 'This action adds a new file';
-  }
+  async saveFiles(
+    files: Express.Multer.File[],
+    folder: string = 'products',
+  ): Promise<IFileResponse[]> {
+    const uploadedFolder = `${path.resolve('uploads')}/${folder}`;
+    await ensureDir(uploadedFolder);
 
-  findAll() {
-    return `This action returns all file`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} file`;
-  }
-
-  update(id: number, updateFileDto: UpdateFileDto) {
-    return `This action updates a #${id} file`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} file`;
+    const response: IFileResponse[] = await Promise.all(
+      files.map(async (file) => {
+        const originalName = `${Date.now()}-${file.originalname}`;
+        await writeFile(`${uploadedFolder}/${originalName}`, file.buffer);
+        return {
+          url: `/uploads/${folder}/${originalName}`,
+          name: originalName,
+        };
+      }),
+    );
+    return response;
   }
 }
