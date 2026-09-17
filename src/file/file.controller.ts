@@ -1,5 +1,7 @@
 import {
   Controller,
+  Delete,
+  Get,
   HttpCode,
   Post,
   Query,
@@ -23,5 +25,22 @@ export class FileController {
     @Query('folder') folder: string = 'products',
   ) {
     return this.fileService.saveFiles(files, folder);
+  }
+
+  @HttpCode(200)
+  @Auth()
+  @Get()
+  async findAllFiles(@Query('folder') folder: string = 'products') {
+    return this.fileService.findAllFiles(folder);
+  }
+
+  @HttpCode(200)
+  @Auth()
+  @Delete()
+  async deleteFile(
+    @Query('folder') folder: string,
+    @Query('fileName') fileName: string,
+  ) {
+    return this.fileService.deleteFile(folder, fileName);
   }
 }

@@ -1,0 +1,43 @@
+### Upload files (multipart/form-data, field name must be "files")
+# @name saveFiles
+POST {{baseUrl}}/file?folder=products
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary{{$timestamp}}
+Authorization: Bearer {{accessToken}}
+
+------WebKitFormBoundary{{$timestamp}}
+Content-Disposition: form-data; name="files"; filename="i3lock.png"
+Content-Type: image/png
+
+< /home/serii/Pictures/i3lock.png
+------WebKitFormBoundary{{$timestamp}}--
+
+> {%
+  client.test("files uploaded", function () {
+    client.assert(response.status === 200, "expected 200, got " + response.status);
+  });
+%}
+
+### Find all files in a folder
+# @name findAllFiles
+GET {{baseUrl}}/file?folder=products
+Authorization: Bearer {{accessToken}}
+
+> {%
+  client.test("files list is an array", function () {
+    client.assert(Array.isArray(response.body), "expected an array in response body");
+  });
+
+  if (Array.isArray(response.body) && response.body.length > 0) {
+    client.global.set("fileName", response.body[0].name);
+  }
+%}
+
+### Delete file
+DELETE {{baseUrl}}/file?folder=products&fileName={{fileName}}
+Authorization: Bearer {{accessToken}}
+
+> {%
+  client.test("file deleted", function () {
+    client.assert(response.status === 200, "expected 200, got " + response.status);
+  });
+%}
