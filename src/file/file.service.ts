@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IFileResponse } from './interfaces/IFileResponse.js';
 import path from 'app-root-path';
 import fsExtra from 'fs-extra';
@@ -41,6 +41,12 @@ export class FileService {
 
   async deleteFile(folder: string, fileName: string): Promise<string> {
     const filePath = `${path.resolve('uploads')}/${folder}/${fileName}`;
+    const fileExists = await fsExtra.pathExists(filePath);
+    if (!fileExists) {
+      throw new NotFoundException(
+        `File ${fileName} does not exist in folder ${folder}`,
+      );
+    }
     await fsExtra.remove(filePath);
     const response = `File ${fileName} deleted successfully from folder ${folder}`;
     return response;
