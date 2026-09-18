@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -49,15 +50,6 @@ export class Product {
   @Column()
   categoryId: string;
 
-  @ManyToOne(() => User, (user) => user.favorites, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn({ name: 'userId' })
-  user: Relation<User>;
-
-  @Column()
-  userId: string;
-
   @ManyToOne(() => Color, (color) => color.products, {
     onDelete: 'CASCADE',
   })
@@ -74,6 +66,9 @@ export class Product {
     cascade: true,
   })
   order_items: Relation<OrderItem[]>;
+
+  @ManyToMany(() => User, (user) => user.favorites)
+  users: Relation<User[]>;
 
   @UpdateDateColumn()
   updatedAt: Date;

@@ -3,6 +3,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -35,7 +37,8 @@ export class User {
   @OneToMany(() => Review, (review) => review.user)
   reviews: Relation<Review[]>;
 
-  @OneToMany(() => Product, (product) => product.user)
+  @ManyToMany(() => Product)
+  @JoinTable({ name: 'user_favorites' })
   favorites: Relation<Product[]>;
 
   @OneToMany(() => Order, (order) => order.user, {
