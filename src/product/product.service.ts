@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto.js';
-import { UpdateProductDto } from './dto/update-product.dto.js';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {ILike, Repository} from 'typeorm';
+import {Product} from './entities/product.entity.js';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+  ) {}
+
+  async findAll(searchTerm?: string): Promise<Product[]> {
+    if (searchTerm) {
+      const filter = this.getBySearchTerm(searchTerm);
+      return this.productRepository.find({
+        where: filter,
+        order: { createdAt: 'DESC' },
+        relations: {
+          store: true,
+          category: true,
+          color: true,
+          reviews: true,
+        },
+      });
+    }
+    return this.productRepository.find();
   }
 
-  findAll() {
-    return `This action returns all product`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
-  }
-
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  private getBySearchTerm(searchTerm: string) {
+    return [
+      { title: ILike(`%${searchTerm}%`) },
+      { description: ILike(`%${searchTerm}%`) },
+    ];
   }
 }
