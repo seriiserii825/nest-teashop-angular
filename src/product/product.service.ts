@@ -1,7 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, Repository } from 'typeorm';
+import { ILike, In, Not, Repository } from 'typeorm';
+import { CategoryService } from '../category/category.service.js';
+import { ColorService } from '../color/color.service.js';
 import { OrderItem } from '../order-item/entities/order-item.entity.js';
+import { StoreService } from '../store/store.service.js';
+import { CreateProductDto } from './dto/create-product.dto.js';
+import { UpdateProductDto } from './dto/update-product.dto.js';
 import { Product } from './entities/product.entity.js';
 
 @Injectable()
@@ -9,6 +18,9 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly storeService: StoreService,
+    private readonly categoryService: CategoryService,
+    private readonly colorService: ColorService,
   ) {}
 
   async findAll(searchTerm?: string): Promise<Product[]> {
@@ -64,7 +76,7 @@ export class ProductService {
   }
 
   async findByCategoryId(categoryId: string): Promise<Product[]> {
-    const products = await this.productRepository.find({
+    return this.productRepository.find({
       where: { category: { id: categoryId } },
       relations: {
         store: true,
@@ -73,12 +85,6 @@ export class ProductService {
         reviews: true,
       },
     });
-    if (products.length === 0) {
-      throw new NotFoundException(
-        `Product with category ID ${categoryId} not found`,
-      );
-    }
-    return products;
   }
 
   async findByMostPopular(limit = 10): Promise<Product[]> {
@@ -102,5 +108,92 @@ export class ProductService {
     // find() по In() не гарантирует порядок — восстанавливаем по popular
     const order = new Map(productIds.map((id, i) => [id, i]));
     return products.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
+  }
+
+  async findByRelatedCategory(productId: string): Promise<Product[]> {
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+      relations: { category: true },
+    });
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${productId} not found`);
+    }
+
+    return this.productRepository.find({
+      where: {
+        category: { id: product.category.id },
+        id: Not(productId),
+      },
+      relations: { store: true, category: true, color: true, reviews: true },
+    });
+  }
+
+  async create(
+    userId: string,
+    storeId: string,
+    dto: CreateProductDto,
+  ): Promise<Product> {
+    await this.storeService.findOne(storeId, userId);
+    await this.categoryService.getByStoreId(userId, storeId, dto.categoryId);
+    await this.colorService.getByStoreId(userId, storeId, dto.colorId);
+
+    const existingProduct = await this.productRepository.findOne({
+      where: { description: dto.description },
+    });
+    if (existingProduct) {
+      throw new BadRequestException(
+        `Product with description "${dto.description}" already exists`,
+      );
+    }
+
+    const product = this.productRepository.create({ ...dto, storeId });
+    return this.productRepository.save(product);
+  }
+
+  async update(
+    userId: string,
+    storeId: string,
+    productId: string,
+    dto: UpdateProductDto,
+  ): Promise<Product> {
+    await this.storeService.findOne(storeId, userId);
+
+    const product = await this.productRepository.findOne({
+      where: { id: productId, storeId },
+    });
+    if (!product) {
+      throw new NotFoundException(
+        `Product with ID ${productId} not found for store ${storeId}`,
+      );
+    }
+
+    if (dto.categoryId) {
+      await this.categoryService.getByStoreId(userId, storeId, dto.categoryId);
+    }
+    if (dto.colorId) {
+      await this.colorService.getByStoreId(userId, storeId, dto.colorId);
+    }
+
+    Object.assign(product, dto);
+    return this.productRepository.save(product);
+  }
+
+  async delete(
+    userId: string,
+    storeId: string,
+    productId: string,
+  ): Promise<void> {
+    await this.storeService.findOne(storeId, userId);
+
+    const product = await this.productRepository.findOne({
+      where: { id: productId, storeId },
+    });
+    if (!product) {
+      throw new NotFoundException(
+        `Product with ID ${productId} not found for store ${storeId}`,
+      );
+    }
+
+    await this.productRepository.remove(product);
   }
 }

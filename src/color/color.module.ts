@@ -14,5 +14,6 @@ import { StoreModule } from '../store/store.module.js';
   ],
   controllers: [ColorController],
   providers: [ColorService],
+  exports: [ColorService],
 })
 export class ColorModule {}
