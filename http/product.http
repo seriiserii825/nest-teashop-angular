@@ -1,0 +1,56 @@
+### Create product
+# @name createProduct
+POST {{baseUrl}}/product/store/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Green Tea",
+  "description": "Fresh green tea leaves",
+  "price": 999,
+  "images": ["https://example.com/green-tea.jpg"],
+  "categoryId": "{{categoryId}}",
+  "colorId": "{{colorId}}"
+}
+
+> {%
+  client.test("product created", function () {
+    client.assert(response.status === 201, "expected 201, got " + response.status);
+  });
+
+  if (response.body && response.body.id) {
+    client.global.set("productId", response.body.id);
+  }
+%}
+
+### Find all products (optionally by search term)
+GET {{baseUrl}}/product?searchTerm=tea
+
+### Find most popular products
+GET {{baseUrl}}/product/most-popular?limit=10
+
+### Find products by category
+GET {{baseUrl}}/product/category/{{categoryId}}
+
+### Find related products
+GET {{baseUrl}}/product/related/{{productId}}
+
+### Find products by store
+GET {{baseUrl}}/product/store/{{storeId}}
+
+### Get one product
+GET {{baseUrl}}/product/{{productId}}
+
+### Update product
+PATCH {{baseUrl}}/product/store/{{storeId}}/product/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Green Tea Premium",
+  "price": 1299
+}
+
+### Delete product
+DELETE {{baseUrl}}/product/store/{{storeId}}/product/{{productId}}
+Authorization: Bearer {{accessToken}}

@@ -182,7 +182,7 @@ export class ProductService {
     userId: string,
     storeId: string,
     productId: string,
-  ): Promise<void> {
+  ): Promise<string> {
     await this.storeService.findOne(storeId, userId);
 
     const product = await this.productRepository.findOne({
@@ -195,5 +195,6 @@ export class ProductService {
     }
 
     await this.productRepository.remove(product);
+    return 'Product deleted successfully';
   }
 }
