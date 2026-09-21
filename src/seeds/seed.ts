@@ -23,8 +23,8 @@ async function seedUsers(dataSource: DataSource) {
   const password = await hash('password123');
 
   return repo.save([
-    repo.create({ name: 'Serii', email: 'serii@example.com', password }),
-    repo.create({ name: 'Nixon', email: 'nixon@example.com', password }),
+    repo.create({ name: 'Serii', email: 'seriiburduja@gmail.com', password }),
+    repo.create({ name: 'Nixon', email: 'nixon@gmail.com', password }),
     repo.create({ name: 'Buyer', email: 'buyer@example.com', password }),
   ]);
 }
