@@ -22,3 +22,36 @@ Authorization: Bearer {{accessToken}}
     client.global.set("orderId", response.body.id);
   }
 %}
+
+### Find all orders
+# @name findAllOrders
+GET {{baseUrl}}/order
+Authorization: Bearer {{accessToken}}
+
+> {%
+  client.test("orders list is not empty", function () {
+    client.assert(Array.isArray(response.body), "expected an array in response body");
+    client.assert(response.body.length > 0, "expected at least one order");
+  });
+
+  if (Array.isArray(response.body) && response.body.length > 0) {
+    client.global.set("orderId", response.body[0].id);
+  }
+%}
+
+### Find one order
+GET {{baseUrl}}/order/{{orderId}}
+Authorization: Bearer {{accessToken}}
+
+### Update order status
+PATCH {{baseUrl}}/order/{{orderId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "status": "PAYED"
+}
+
+### Delete order
+DELETE {{baseUrl}}/order/{{orderId}}
+Authorization: Bearer {{accessToken}}
