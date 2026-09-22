@@ -1,0 +1,41 @@
+### Create review
+# @name createReview
+POST {{baseUrl}}/review/product/{{productId}}/store/{{storeId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "text": "Great tea, love the flavor!",
+  "rating": 5
+}
+
+> {%
+  client.test("review created", function () {
+    client.assert(response.status === 201, "expected 201, got " + response.status);
+  });
+
+  if (response.body && response.body.id) {
+    client.global.set("reviewId", response.body.id);
+  }
+%}
+
+### Find reviews by store
+GET {{baseUrl}}/review/store/{{storeId}}
+
+### Get one review
+GET {{baseUrl}}/review/{{reviewId}}
+Authorization: Bearer {{accessToken}}
+
+### Update review
+PATCH {{baseUrl}}/review/{{reviewId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "text": "Updated review text",
+  "rating": 4
+}
+
+### Delete review
+DELETE {{baseUrl}}/review/{{reviewId}}
+Authorization: Bearer {{accessToken}}

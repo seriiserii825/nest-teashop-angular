@@ -18,5 +18,6 @@ import { ColorModule } from '../color/color.module.js';
   ],
   controllers: [ProductController],
   providers: [ProductService],
+  exports: [ProductService],
 })
 export class ProductModule {}

@@ -171,11 +171,60 @@ async function seedReviews(
       storeId: stores[0].id,
     }),
     repo.create({
+      text: 'Nice grassy notes, brews smooth.',
+      rating: 4,
+      userId: users[1].id,
+      productId: products[0].id,
+      storeId: stores[0].id,
+    }),
+    repo.create({
+      text: 'A bit weak for my taste, but decent.',
+      rating: 3,
+      userId: users[0].id,
+      productId: products[0].id,
+      storeId: stores[0].id,
+    }),
+    repo.create({
       text: 'Good but a bit pricey.',
       rating: 4,
       userId: users[2].id,
       productId: products[1].id,
       storeId: stores[0].id,
+    }),
+    repo.create({
+      text: 'Classic Earl Grey, love the bergamot.',
+      rating: 5,
+      userId: users[1].id,
+      productId: products[1].id,
+      storeId: stores[0].id,
+    }),
+    repo.create({
+      text: 'Solid black tea, goes great with milk.',
+      rating: 4,
+      userId: users[0].id,
+      productId: products[1].id,
+      storeId: stores[0].id,
+    }),
+    repo.create({
+      text: 'Soothing and relaxing before bed.',
+      rating: 5,
+      userId: users[2].id,
+      productId: products[2].id,
+      storeId: stores[1].id,
+    }),
+    repo.create({
+      text: 'Subtle chamomile taste, could be stronger.',
+      rating: 3,
+      userId: users[0].id,
+      productId: products[2].id,
+      storeId: stores[1].id,
+    }),
+    repo.create({
+      text: 'Perfect caffeine-free evening drink.',
+      rating: 5,
+      userId: users[1].id,
+      productId: products[2].id,
+      storeId: stores[1].id,
     }),
   ]);
 }
@@ -211,7 +260,7 @@ async function main() {
       colors,
     );
     await seedOrders(AppDataSource, users, stores, products);
-    await seedReviews(AppDataSource, users, stores, products);
+    const reviews = await seedReviews(AppDataSource, users, stores, products);
     await seedFavorites(AppDataSource, users, products);
 
     console.log('Seed complete:');
@@ -220,6 +269,7 @@ async function main() {
     console.log(`  categories: ${categories.length}`);
     console.log(`  colors: ${colors.length}`);
     console.log(`  products: ${products.length}`);
+    console.log(`  reviews: ${reviews.length}`);
     console.log('Test accounts (password: password123):');
     for (const user of users) {
       console.log(`  ${user.email}`);
