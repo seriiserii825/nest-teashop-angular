@@ -11,14 +11,15 @@ import {
 } from 'typeorm';
 import { OrderItem } from '../../order-item/entities/order-item.entity.js';
 import { User } from '../../user/entities/user.entity.js';
+import { OrderStatus } from '../enums/order-status.enum.js';
 
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ default: 'PENDING' })
-  status: 'PENDING' | 'PAYED';
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
+  status: OrderStatus;
 
   @Column()
   total: number;

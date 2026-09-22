@@ -4,6 +4,7 @@ import AppDataSource from '../data-source.js';
 import { Category } from '../category/entities/category.entity.js';
 import { Color } from '../color/entities/color.entity.js';
 import { Order } from '../order/entities/order.entity.js';
+import { OrderStatus } from '../order/enums/order-status.enum.js';
 import { OrderItem } from '../order-item/entities/order-item.entity.js';
 import { Product } from '../product/entities/product.entity.js';
 import { Review } from '../review/entities/review.entity.js';
@@ -128,7 +129,7 @@ async function seedOrders(
 
   const order = await orderRepo.save(
     orderRepo.create({
-      status: 'PAYED',
+      status: OrderStatus.PAYED,
       total: products[0].price * 2 + products[1].price,
       userId: users[2].id,
     }),
