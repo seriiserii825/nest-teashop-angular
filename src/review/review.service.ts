@@ -46,6 +46,13 @@ export class ReviewService {
     productId: string,
     storeId: string,
   ): Promise<Review> {
+    const product = await this.productService.findOne(productId);
+    if (product.storeId !== storeId) {
+      throw new NotFoundException(
+        `Product with ID ${productId} not found for store ${storeId}`,
+      );
+    }
+
     const review = this.reviewRepository.create({
       ...dto,
       userId,
