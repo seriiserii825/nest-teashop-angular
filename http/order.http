@@ -1,0 +1,24 @@
+### Create order
+# @name createOrder
+POST {{baseUrl}}/order
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "items": [
+    {
+      "productId": "{{productId}}",
+      "quantity": 2
+    }
+  ]
+}
+
+> {%
+  client.test("order created", function () {
+    client.assert(response.status === 201, "expected 201, got " + response.status);
+  });
+
+  if (response.body && response.body.id) {
+    client.global.set("orderId", response.body.id);
+  }
+%}
