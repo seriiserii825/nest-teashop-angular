@@ -14,5 +14,6 @@ import { ProductModule } from '../product/product.module.js';
   ],
   controllers: [OrderController],
   providers: [OrderService],
+  exports: [OrderService],
 })
 export class OrderModule {}

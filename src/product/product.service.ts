@@ -197,4 +197,8 @@ export class ProductService {
     await this.productRepository.remove(product);
     return 'Product deleted successfully';
   }
+
+  async countByStoreId(storeId: string): Promise<number> {
+    return this.productRepository.count({ where: { storeId } });
+  }
 }

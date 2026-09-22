@@ -14,5 +14,6 @@ import { PassportModule } from '@nestjs/passport';
   ],
   controllers: [ReviewController],
   providers: [ReviewService],
+  exports: [ReviewService],
 })
 export class ReviewModule {}

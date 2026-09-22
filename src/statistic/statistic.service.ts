@@ -1,26 +1,85 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStatisticDto } from './dto/create-statistic.dto.js';
-import { UpdateStatisticDto } from './dto/update-statistic.dto.js';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { OrderService } from '../order/order.service.js';
+import { ProductService } from '../product/product.service.js';
+import { Statistic } from './entities/statistic.entity.js';
+import { CategoryService } from '../category/category.service.js';
+import { ReviewService } from '../review/review.service.js';
 
 @Injectable()
 export class StatisticService {
-  create(createStatisticDto: CreateStatisticDto) {
-    return 'This action adds a new statistic';
+  constructor(
+    @InjectRepository(Statistic)
+    private readonly statisticRepository: Repository<Statistic>,
+    private readonly orderService: OrderService,
+    private readonly productService: ProductService,
+    private readonly categoryService: CategoryService,
+    private readonly reviewService: ReviewService,
+  ) {}
+
+  async getMainStatistic(storeId: string) {
+    const totalRevenue = await this.calculateTotalRevenue(storeId);
+    const productsCount = await this.countProducts(storeId);
+    const categoriesCount = await this.countCategories(storeId);
+
+    const averageRating = await this.calculateAverageRating(storeId);
+
+    return [
+      { id: 1, name: 'Total Revenue', value: totalRevenue },
+      { id: 2, name: 'Products Count', value: productsCount },
+      { id: 3, name: 'Categories Count', value: categoriesCount },
+      { id: 4, name: 'Average Rating', value: averageRating },
+    ];
   }
 
-  findAll() {
-    return `This action returns all statistic`;
+  async getMiddleStatistics(storeId: string) {
+    const monthlySales = await this.calculateMonthlySales(storeId);
+    const latestUsers = await this.getLatestUsers(storeId);
+    return { monthlySales, latestUsers };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} statistic`;
+  private async calculateMonthlySales(storeId: string) {
+    const orders = await this.orderService.findByStoreId(storeId);
+    const monthlySales = {} as Record<string, number>;
+
+    orders.forEach((order) => {
+      const month = order.createdAt.getMonth() + 1; // Months are zero-based
+      const year = order.createdAt.getFullYear();
+      const key = `${year}-${month}`;
+
+      if (!monthlySales[key]) {
+        monthlySales[key] = 0;
+      }
+      monthlySales[key] += order.total;
+    });
+
+    return monthlySales;
   }
 
-  update(id: number, updateStatisticDto: UpdateStatisticDto) {
-    return `This action updates a #${id} statistic`;
+  private async getLatestUsers(storeId: string) {
+    const orders = await this.orderService.findByStoreId(storeId);
+    const userIds = new Set(orders.map((order) => order.userId));
+    return Array.from(userIds).slice(-5); // Return the last 5 unique users
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} statistic`;
+  private async calculateTotalRevenue(storeId: string): Promise<number> {
+    const orders = await this.orderService.findByStoreId(storeId);
+    const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+    return totalRevenue;
+  }
+
+  private async countProducts(storeId: string): Promise<number> {
+    const products_count = await this.productService.countByStoreId(storeId);
+    return products_count;
+  }
+
+  private async countCategories(storeId: string): Promise<number> {
+    const categories_count = await this.categoryService.countByStoreId(storeId);
+    return categories_count;
+  }
+
+  private async calculateAverageRating(storeId: string): Promise<number> {
+    return this.reviewService.calculateAverageRating(storeId);
   }
 }

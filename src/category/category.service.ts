@@ -89,4 +89,8 @@ export class CategoryService {
     await this.categoryRepository.delete({ id: categoryId, storeId });
     return { message: `Category with id ${categoryId} deleted successfully` };
   }
+
+  async countByStoreId(storeId: string): Promise<number> {
+    return this.categoryRepository.count({ where: { storeId } });
+  }
 }

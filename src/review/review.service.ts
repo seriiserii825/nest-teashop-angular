@@ -77,4 +77,13 @@ export class ReviewService {
     await this.reviewRepository.remove(review);
     return 'Review deleted successfully';
   }
+
+  async calculateAverageRating(storeId: string): Promise<number> {
+    const reviews = await this.findByStoreId(storeId);
+    if (reviews.length === 0) {
+      return 0;
+    }
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return totalRating / reviews.length;
+  }
 }
