@@ -61,3 +61,5 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 http/http-client.private.env.json
+.env.sha256
+http/http-client.private.env.json.sha256

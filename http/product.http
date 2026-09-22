@@ -24,7 +24,14 @@ Authorization: Bearer {{accessToken}}
 %}
 
 ### Find all products (optionally by search term)
+# @name findAllProducts
 GET {{baseUrl}}/product?searchTerm=tea
+
+> {%
+  if (Array.isArray(response.body) && response.body.length > 0) {
+    client.global.set("productId", response.body[0].id);
+  }
+%}
 
 ### Find most popular products
 GET {{baseUrl}}/product/most-popular?limit=10

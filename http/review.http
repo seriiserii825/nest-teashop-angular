@@ -20,7 +20,14 @@ Authorization: Bearer {{accessToken}}
 %}
 
 ### Find reviews by store
+# @name findReviewsByStore
 GET {{baseUrl}}/review/store/{{storeId}}
+
+> {%
+  if (Array.isArray(response.body) && response.body.length > 0) {
+    client.global.set("reviewId", response.body[0].id);
+  }
+%}
 
 ### Get one review
 GET {{baseUrl}}/review/{{reviewId}}

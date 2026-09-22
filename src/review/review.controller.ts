@@ -21,6 +21,7 @@ export class ReviewController {
     return this.reviewService.findByStoreId(storeId);
   }
 
+  @Auth()
   @Get(':id')
   async findOne(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return this.reviewService.findOne(id, userId);

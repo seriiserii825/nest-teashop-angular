@@ -65,8 +65,9 @@ export class ReviewService {
     return this.reviewRepository.save(review);
   }
 
-  async delete(id: string, userId: string): Promise<void> {
+  async delete(id: string, userId: string): Promise<string> {
     const review = await this.findOne(id, userId);
     await this.reviewRepository.remove(review);
+    return 'Review deleted successfully';
   }
 }
