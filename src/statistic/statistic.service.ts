@@ -1,21 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { OrderService } from '../order/order.service.js';
 import { ProductService } from '../product/product.service.js';
-import { Statistic } from './entities/statistic.entity.js';
 import { CategoryService } from '../category/category.service.js';
 import { ReviewService } from '../review/review.service.js';
+import { UserService } from '../user/user.service.js';
+import { User } from '../user/entities/user.entity.js';
 
 @Injectable()
 export class StatisticService {
   constructor(
-    @InjectRepository(Statistic)
-    private readonly statisticRepository: Repository<Statistic>,
     private readonly orderService: OrderService,
     private readonly productService: ProductService,
     private readonly categoryService: CategoryService,
     private readonly reviewService: ReviewService,
+    private readonly userService: UserService,
   ) {}
 
   async getMainStatistic(storeId: string) {
@@ -57,10 +55,11 @@ export class StatisticService {
     return monthlySales;
   }
 
-  private async getLatestUsers(storeId: string) {
+  private async getLatestUsers(storeId: string): Promise<User[]> {
     const orders = await this.orderService.findByStoreId(storeId);
     const userIds = new Set(orders.map((order) => order.userId));
-    return Array.from(userIds).slice(-5); // Return the last 5 unique users
+    const user_ids = Array.from(userIds).slice(-5);
+    return this.userService.findByIds(user_ids);
   }
 
   private async calculateTotalRevenue(storeId: string): Promise<number> {

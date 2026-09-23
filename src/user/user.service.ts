@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hash } from 'argon2';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AuthDto } from '../auth/dto/auth.dto.js';
 import { Product } from '../product/entities/product.entity.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
@@ -25,6 +25,12 @@ export class UserService {
     return this.userRepository.find({
       relations: { stores: true, favorites: true, orders: true, reviews: true },
     });
+  }
+
+  findByIds(ids: string[]): Promise<User[]> {
+    return this.userRepository.findBy({
+      id: In(ids),
+    })
   }
 
   async findOne(id: string): Promise<User> {

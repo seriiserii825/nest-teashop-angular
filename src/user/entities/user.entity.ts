@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Order } from '../../order/entities/order.entity.js';
 import { Product } from '../../product/entities/product.entity.js';
 import { Review } from '../../review/entities/review.entity.js';
@@ -33,8 +33,8 @@ export class User {
   @Column({ default: '/uploads/no-user-image.jpg' })
   picture: string;
 
-  @ApiProperty({ type: String, nullable: true })
-  @Column({ type: 'varchar', nullable: true })
+  @ApiHideProperty()
+  @Column({ type: 'varchar', nullable: true, select: false })
   password: string | null;
 
   @ApiProperty({ type: () => Store, isArray: true })

@@ -8,6 +8,7 @@ import { ReviewModule } from '../review/review.module.js';
 import { Statistic } from './entities/statistic.entity.js';
 import { StatisticController } from './statistic.controller.js';
 import { StatisticService } from './statistic.service.js';
+import { UserModule } from '../user/user.module.js';
 
 @Module({
   controllers: [StatisticController],
@@ -18,6 +19,7 @@ import { StatisticService } from './statistic.service.js';
     ProductModule,
     CategoryModule,
     ReviewModule,
+    UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
 })
