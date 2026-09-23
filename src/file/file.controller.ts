@@ -20,17 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator.js';
 import { FileService } from './file.service.js';
-
-const fileResponseSchema = {
-  type: 'array' as const,
-  items: {
-    type: 'object' as const,
-    properties: {
-      url: { type: 'string' },
-      name: { type: 'string' },
-    },
-  },
-};
+import { FileResponseDto } from './dto/file-response.dto.js';
 
 @ApiTags('file')
 @ApiBearerAuth()
@@ -53,23 +43,23 @@ export class FileController {
       },
     },
   })
-  @ApiOkResponse({ description: 'Files uploaded successfully.', schema: fileResponseSchema })
+  @ApiOkResponse({ description: 'Files uploaded successfully.', type: FileResponseDto, isArray: true })
   @HttpCode(200)
   @UseInterceptors(FilesInterceptor('files'))
   @Post()
   async saveFiles(
     @UploadedFiles() files: Express.Multer.File[],
     @Query('folder') folder: string = 'products',
-  ) {
+  ): Promise<FileResponseDto[]> {
     return this.fileService.saveFiles(files, folder);
   }
 
   @ApiOperation({ summary: 'List files in a folder' })
   @ApiQuery({ name: 'folder', required: false })
-  @ApiOkResponse({ description: 'List of files.', schema: fileResponseSchema })
+  @ApiOkResponse({ description: 'List of files.', type: FileResponseDto, isArray: true })
   @HttpCode(200)
   @Get()
-  async findAllFiles(@Query('folder') folder: string = 'products') {
+  async findAllFiles(@Query('folder') folder: string = 'products'): Promise<FileResponseDto[]> {
     return this.fileService.findAllFiles(folder);
   }
 
@@ -82,7 +72,7 @@ export class FileController {
   async deleteFile(
     @Query('folder') folder: string,
     @Query('fileName') fileName: string,
-  ) {
+  ): Promise<string> {
     return this.fileService.deleteFile(folder, fileName);
   }
 }

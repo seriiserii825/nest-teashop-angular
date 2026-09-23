@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { IFileResponse } from './interfaces/IFileResponse.js';
+import { FileResponseDto } from './dto/file-response.dto.js';
 import path from 'app-root-path';
 import fsExtra from 'fs-extra';
 
@@ -10,11 +10,11 @@ export class FileService {
   async saveFiles(
     files: Express.Multer.File[],
     folder: string = 'products',
-  ): Promise<IFileResponse[]> {
+  ): Promise<FileResponseDto[]> {
     const uploadedFolder = `${path.resolve('uploads')}/${folder}`;
     await ensureDir(uploadedFolder);
 
-    const response: IFileResponse[] = await Promise.all(
+    const response: FileResponseDto[] = await Promise.all(
       files.map(async (file) => {
         const originalName = `${Date.now()}-${file.originalname}`;
         await writeFile(`${uploadedFolder}/${originalName}`, file.buffer);
@@ -27,12 +27,12 @@ export class FileService {
     return response;
   }
 
-  async findAllFiles(folder: string = 'products'): Promise<IFileResponse[]> {
+  async findAllFiles(folder: string = 'products'): Promise<FileResponseDto[]> {
     const uploadedFolder = `${path.resolve('uploads')}/${folder}`;
     await ensureDir(uploadedFolder);
 
     const files = await fsExtra.readdir(uploadedFolder);
-    const response: IFileResponse[] = files.map((file) => ({
+    const response: FileResponseDto[] = files.map((file) => ({
       url: `/uploads/${folder}/${file}`,
       name: file,
     }));

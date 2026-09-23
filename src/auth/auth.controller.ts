@@ -21,6 +21,7 @@ import {
 import { AuthService } from './auth.service.js';
 import { AuthDto } from './dto/auth.dto.js';
 import { AuthResponseDto } from './dto/auth-response.dto.js';
+import { MessageResponseDto } from '../common/dto/message-response.dto.js';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 
@@ -93,10 +94,13 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Log out and clear the refresh token cookie' })
-  @ApiOkResponse({ description: 'Logged out successfully.' })
+  @ApiOkResponse({
+    description: 'Logged out successfully.',
+    type: MessageResponseDto,
+  })
   @HttpCode(200)
   @Post('logout')
-  async logout(@Res({ passthrough: true }) res: Response) {
+  async logout(@Res({ passthrough: true }) res: Response): Promise<MessageResponseDto> {
     this.authService.removeRefreshTokenFromResponse(res);
     return { message: 'Logged out successfully' };
   }
