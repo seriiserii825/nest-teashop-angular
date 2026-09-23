@@ -7,17 +7,30 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator.js';
 import { CurrentUser } from '../user/decorators/user.decorator.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { OrderService } from './order.service.js';
+import { Order } from './entities/order.entity.js';
 
+@ApiTags('order')
+@ApiBearerAuth()
+@Auth()
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @Auth()
+  @ApiOperation({ summary: 'Create an order for the current user' })
+  @ApiCreatedResponse({ description: 'Order created successfully.', type: Order })
   @Post()
   create(
     @CurrentUser('id') userId: string,
@@ -26,19 +39,24 @@ export class OrderController {
     return this.orderService.create(createOrderDto, userId);
   }
 
-  @Auth()
+  @ApiOperation({ summary: "List the current user's orders" })
+  @ApiOkResponse({ description: 'List of orders.', type: Order, isArray: true })
   @Get()
   findAll(@CurrentUser('id') userId: string) {
     return this.orderService.findAll(userId);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'Get an order owned by the current user' })
+  @ApiOkResponse({ description: 'Order found successfully.', type: Order })
+  @ApiNotFoundResponse({ description: 'Order not found.' })
   @Get(':id')
   findOne(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.orderService.findOne(id, userId);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'Update an order owned by the current user' })
+  @ApiOkResponse({ description: 'Order updated successfully.', type: Order })
+  @ApiNotFoundResponse({ description: 'Order not found.' })
   @Patch(':id')
   update(
     @CurrentUser('id') userId: string,
@@ -48,7 +66,9 @@ export class OrderController {
     return this.orderService.update(id, userId, updateOrderDto);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'Delete an order owned by the current user' })
+  @ApiOkResponse({ description: 'Order deleted successfully.', type: Order })
+  @ApiNotFoundResponse({ description: 'Order not found.' })
   @Delete(':id')
   remove(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.orderService.remove(id, userId);

@@ -7,17 +7,31 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ColorService } from './color.service.js';
 import { CreateColorDto } from './dto/create-color.dto.js';
 import { UpdateColorDto } from './dto/update-color.dto.js';
 import { Auth } from '../auth/decorators/auth.decorator.js';
 import { CurrentUser } from '../user/decorators/user.decorator.js';
+import { Color } from './entities/color.entity.js';
 
+@ApiTags('color')
+@ApiBearerAuth()
+@Auth()
 @Controller('color')
 export class ColorController {
   constructor(private readonly colorService: ColorService) {}
 
-  @Auth()
+  @ApiOperation({ summary: 'Get a color by id within a store' })
+  @ApiOkResponse({ description: 'Color found successfully.', type: Color })
+  @ApiBadRequestResponse({ description: 'Color not found for this store.' })
   @Get('store/:storeId/color/:colorId')
   getByStoreId(
     @CurrentUser('id') userId: string,
@@ -27,7 +41,9 @@ export class ColorController {
     return this.colorService.getByStoreId(userId, storeId, colorId);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'Create a color for a store' })
+  @ApiCreatedResponse({ description: 'Color created successfully.', type: Color })
+  @ApiBadRequestResponse({ description: 'A color with this name already exists for this store.' })
   @Post('store/:storeId')
   create(
     @CurrentUser('id') userId: string,
@@ -37,7 +53,8 @@ export class ColorController {
     return this.colorService.create(userId, storeId, createColorDto);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'List colors for a store' })
+  @ApiOkResponse({ description: 'List of colors.', type: Color, isArray: true })
   @Get('store/:storeId')
   findAll(
     @CurrentUser('id') userId: string,
@@ -46,7 +63,9 @@ export class ColorController {
     return this.colorService.findAll(userId, storeId);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'Update a color within a store' })
+  @ApiOkResponse({ description: 'Color updated successfully.', type: Color })
+  @ApiBadRequestResponse({ description: 'Color not found for this store.' })
   @Patch('store/:storeId/color/:id')
   update(
     @CurrentUser('id') userId: string,
@@ -57,7 +76,9 @@ export class ColorController {
     return this.colorService.update(userId, storeId, id, updateColorDto);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'Delete a color within a store' })
+  @ApiOkResponse({ description: 'Color deleted successfully.' })
+  @ApiBadRequestResponse({ description: 'Color not found for this store.' })
   @Delete('store/:storeId/color/:id')
   remove(
     @CurrentUser('id') userId: string,

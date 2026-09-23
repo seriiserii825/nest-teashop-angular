@@ -1,18 +1,24 @@
 import { Controller, Get, Param } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator.js';
 import { StatisticService } from './statistic.service.js';
 
+@ApiTags('statistic')
+@ApiBearerAuth()
+@Auth()
 @Controller('statistic')
 export class StatisticController {
   constructor(private readonly statisticService: StatisticService) {}
 
-  @Auth()
+  @ApiOperation({ summary: 'Get main statistics for a store (revenue, products, categories, rating)' })
+  @ApiOkResponse({ description: 'Main statistics.' })
   @Get('main/store/:storeId')
   async getMainStatistic(@Param('storeId') storeId: string) {
     return this.statisticService.getMainStatistic(storeId);
   }
 
-  @Auth()
+  @ApiOperation({ summary: 'Get middle statistics for a store (monthly sales, latest users)' })
+  @ApiOkResponse({ description: 'Middle statistics.' })
   @Get('middle/store/:storeId')
   async getMiddleStatistics(@Param('storeId') storeId: string) {
     return this.statisticService.getMiddleStatistics(storeId);

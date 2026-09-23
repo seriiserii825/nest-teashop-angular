@@ -7,26 +7,46 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ReviewService } from './review.service.js';
 import { CurrentUser } from '../user/decorators/user.decorator.js';
 import { Auth } from '../auth/decorators/auth.decorator.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
+import { Review } from './entities/review.entity.js';
 
+@ApiTags('review')
 @Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
+  @ApiOperation({ summary: 'List reviews for a store' })
+  @ApiOkResponse({ description: 'List of reviews.', type: Review, isArray: true })
   @Get('store/:storeId')
   async findByStoreId(@Param('storeId') storeId: string) {
     return this.reviewService.findByStoreId(storeId);
   }
 
+  @ApiOperation({ summary: 'Get a review owned by the current user' })
+  @ApiOkResponse({ description: 'Review found successfully.', type: Review })
+  @ApiNotFoundResponse({ description: 'Review not found.' })
+  @ApiBearerAuth()
   @Auth()
   @Get(':id')
   async findOne(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return this.reviewService.findOne(id, userId);
   }
 
+  @ApiOperation({ summary: 'Create a review for a product in a store' })
+  @ApiCreatedResponse({ description: 'Review created successfully.', type: Review })
+  @ApiNotFoundResponse({ description: 'Product not found for this store.' })
+  @ApiBearerAuth()
   @Auth()
   @Post('product/:productId/store/:storeId')
   async create(
@@ -38,6 +58,10 @@ export class ReviewController {
     return this.reviewService.create(dto, userId, productId, storeId);
   }
 
+  @ApiOperation({ summary: 'Update a review owned by the current user' })
+  @ApiOkResponse({ description: 'Review updated successfully.', type: Review })
+  @ApiNotFoundResponse({ description: 'Review not found.' })
+  @ApiBearerAuth()
   @Auth()
   @Patch(':id')
   async update(
@@ -48,6 +72,10 @@ export class ReviewController {
     return this.reviewService.update(id, dto, userId);
   }
 
+  @ApiOperation({ summary: 'Delete a review owned by the current user' })
+  @ApiOkResponse({ description: 'Review deleted successfully.', type: String })
+  @ApiNotFoundResponse({ description: 'Review not found.' })
+  @ApiBearerAuth()
   @Auth()
   @Delete(':id')
   async delete(@Param('id') id: string, @CurrentUser('id') userId: string) {
