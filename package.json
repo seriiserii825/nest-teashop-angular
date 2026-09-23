@@ -25,10 +25,10 @@
     "migration:to_check": "npx typeorm-ts-node-esm schema:log -d src/data-source.ts",
     "migration:generate": "typeorm-ts-node-esm migration:generate -d src/data-source.ts",
     "migration:create": "typeorm-ts-node-esm migration:create",
-    "migration:run": "typeorm-ts-node-esm migration:run -d src/data-source.ts",
-    "migration:revert": "typeorm-ts-node-esm migration:revert -d src/data-source.ts",
-    "migration:show": "typeorm-ts-node-esm migration:show -d src/data-source.ts",
-    "seed:run": "node --loader ts-node/esm src/seeds/seed.ts"
+    "migration:run": "npm run build && typeorm migration:run -d dist/data-source.js",
+    "migration:revert": "npm run build && typeorm migration:revert -d dist/data-source.js",
+    "migration:show": "npm run build && typeorm migration:show -d dist/data-source.js",
+    "seed:run": "npm run build && node dist/seeds/seed.js"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
