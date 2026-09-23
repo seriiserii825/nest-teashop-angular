@@ -4,6 +4,7 @@ import { In, Repository } from 'typeorm';
 import { ProductService } from '../product/product.service.js';
 import { Review } from './entities/review.entity.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
+import { UpdateReviewDto } from './dto/update-review.dto.js';
 
 @Injectable()
 export class ReviewService {
@@ -64,7 +65,7 @@ export class ReviewService {
 
   async update(
     id: string,
-    dto: Partial<CreateReviewDto>,
+    dto: UpdateReviewDto,
     userId: string,
   ): Promise<Review> {
     const review = await this.findOne(id, userId);

@@ -12,14 +12,17 @@ export class MainStatisticDto {
   value: number;
 }
 
+export class MonthlySalesDto {
+  @ApiProperty({ description: 'Month in "YYYY-MM" format.', example: '2026-09' })
+  date: string;
+
+  @ApiProperty({ description: 'Revenue for the month.', example: '1500' })
+  value: string;
+}
+
 export class MiddleStatisticDto {
-  @ApiProperty({
-    description: 'Revenue per month, keyed by "YYYY-M".',
-    type: 'object',
-    additionalProperties: { type: 'number' },
-    example: { '2026-9': 1500 },
-  })
-  monthlySales: Record<string, number>;
+  @ApiProperty({ type: () => MonthlySalesDto, isArray: true })
+  monthlySales: MonthlySalesDto[];
 
   @ApiProperty({ type: () => UserDto, isArray: true })
   latestUsers: UserDto[];

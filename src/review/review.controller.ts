@@ -19,6 +19,7 @@ import { ReviewService } from './review.service.js';
 import { CurrentUser } from '../user/decorators/user.decorator.js';
 import { Auth } from '../auth/decorators/auth.decorator.js';
 import { CreateReviewDto } from './dto/create-review.dto.js';
+import { UpdateReviewDto } from './dto/update-review.dto.js';
 import { ReviewDto } from './dto/review.dto.js';
 
 @ApiTags('review')
@@ -66,7 +67,7 @@ export class ReviewController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @Body() dto: Partial<CreateReviewDto>,
+    @Body() dto: UpdateReviewDto,
     @CurrentUser('id') userId: string,
   ): Promise<ReviewDto> {
     return this.reviewService.update(id, dto, userId);

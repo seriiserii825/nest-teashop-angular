@@ -5,6 +5,7 @@ import { CategoryService } from '../category/category.service.js';
 import { ReviewService } from '../review/review.service.js';
 import { UserService } from '../user/user.service.js';
 import { User } from '../user/entities/user.entity.js';
+import { MonthlySalesDto } from './dto/statistic-response.dto.js';
 
 @Injectable()
 export class StatisticService {
@@ -37,22 +38,24 @@ export class StatisticService {
     return { monthlySales, latestUsers };
   }
 
-  private async calculateMonthlySales(storeId: string) {
+  private async calculateMonthlySales(
+    storeId: string,
+  ): Promise<MonthlySalesDto[]> {
     const orders = await this.orderService.findByStoreId(storeId);
-    const monthlySales = {} as Record<string, number>;
+    const monthlySales = new Map<string, number>();
 
     orders.forEach((order) => {
-      const month = order.createdAt.getMonth() + 1; // Months are zero-based
+      const month = String(order.createdAt.getMonth() + 1).padStart(2, '0'); // Months are zero-based
       const year = order.createdAt.getFullYear();
-      const key = `${year}-${month}`;
+      const date = `${year}-${month}`;
 
-      if (!monthlySales[key]) {
-        monthlySales[key] = 0;
-      }
-      monthlySales[key] += order.total;
+      monthlySales.set(date, (monthlySales.get(date) ?? 0) + order.total);
     });
 
-    return monthlySales;
+    return Array.from(monthlySales, ([date, value]) => ({
+      date,
+      value: String(value),
+    })).sort((a, b) => a.date.localeCompare(b.date));
   }
 
   private async getLatestUsers(storeId: string): Promise<User[]> {
