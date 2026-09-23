@@ -12,6 +12,7 @@ import {
 import type { Request, Response } from 'express';
 import {
   ApiExcludeEndpoint,
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -19,6 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service.js';
 import { AuthDto } from './dto/auth.dto.js';
+import { AuthResponseDto } from './dto/auth-response.dto.js';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 
@@ -33,10 +35,14 @@ export class AuthController {
   @ApiOperation({ summary: 'Log in with email and password' })
   @ApiOkResponse({
     description: 'Returns an access token and the authenticated user.',
+    type: AuthResponseDto,
   })
   @HttpCode(200)
   @Post('login')
-  async login(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() dto: AuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponseDto> {
     const { refreshToken, ...response } = await this.authService.login(dto);
     this.authService.addRefreshTokenToResponse(res, refreshToken);
     return response;
@@ -45,6 +51,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Exchange the refresh token cookie for a new access token' })
   @ApiOkResponse({
     description: 'Returns a new access token and the authenticated user.',
+    type: AuthResponseDto,
   })
   @ApiUnauthorizedResponse({ description: 'Refresh token missing or invalid.' })
   @HttpCode(200)
@@ -52,7 +59,7 @@ export class AuthController {
   async getNewTokens(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const refreshTokenFromCookie =
       req.cookies[this.authService.REFRESH_TOKEN_NAME];
 
@@ -70,15 +77,16 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description: 'Returns an access token and the created user.',
+    type: AuthResponseDto,
   })
   @HttpCode(201)
   @Post('register')
   async register(
     @Body() dto: AuthDto,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<AuthResponseDto> {
     const { refreshToken, ...response } = await this.authService.register(dto);
     this.authService.addRefreshTokenToResponse(res, refreshToken);
     return response;
