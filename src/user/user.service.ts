@@ -55,6 +55,14 @@ export class UserService {
     return user;
   }
 
+  async findByEmailWithPassword(email: string): Promise<User | null> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
+  }
+
   update(id: string, updateUserDto: UpdateUserDto): string {
     return `This action updates a #${id} user`;
   }

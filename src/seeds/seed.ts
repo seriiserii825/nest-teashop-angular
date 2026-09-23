@@ -21,7 +21,7 @@ async function truncateAll(dataSource: DataSource): Promise<void> {
 
 async function seedUsers(dataSource: DataSource) {
   const repo = dataSource.getRepository(User);
-  const password = await hash('password123');
+  const password = await hash('123456');
 
   return repo.save([
     repo.create({ name: 'Serii', email: 'seriiburduja@gmail.com', password }),

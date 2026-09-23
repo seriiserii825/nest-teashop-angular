@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { verify } from 'argon2';
 import { UserService } from '../user/user.service.js';
 import { ConfigService } from '@nestjs/config';
 import { AuthDto } from './dto/auth.dto.js';
@@ -32,7 +33,8 @@ export class AuthService {
   ) {}
 
   async login(dto: AuthDto): Promise<AuthResult> {
-    const user = await this.validateUser(dto);
+    const validatedUser = await this.validateUser(dto);
+    const user = await this.userService.findOne(validatedUser.id);
     const tokens = this.generateTokens(user.id);
     return { user, ...tokens };
   }
@@ -48,8 +50,10 @@ export class AuthService {
   }
 
   async getNewTokens(refreshToken: string): Promise<AuthResult> {
-    const result = await this.jwt.verifyAsync(refreshToken);
-    if (!result) {
+    let result: { id: string };
+    try {
+      result = await this.jwt.verifyAsync(refreshToken);
+    } catch {
       throw new UnauthorizedException('Invalid refresh token');
     }
     const user = await this.userService.findOne(result.id);
@@ -71,9 +75,12 @@ export class AuthService {
   }
 
   private async validateUser(dto: AuthDto): Promise<User> {
-    const user = await this.userService.findByEmail(dto.email);
+    const user = await this.userService.findByEmailWithPassword(dto.email);
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+    if (!user.password || !dto.password || !(await verify(user.password, dto.password))) {
+      throw new UnauthorizedException('Invalid credentials');
     }
     return user;
   }
