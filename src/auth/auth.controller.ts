@@ -124,7 +124,7 @@ export class AuthController {
     this.authService.addRefreshTokenToResponse(res, refreshToken);
 
     return res.redirect(
-      `${this.configService.get('CLIENT_URL')}/dashboard?accessToken=${response.accessToken}`,
+      `${this.configService.get('CLIENT_URL')}/google-callback?accessToken=${response.accessToken}`,
     );
   }
 }
