@@ -66,6 +66,7 @@ export class StoreService {
   async findAll(userId: string) {
     return this.storeRepository.find({
       where: { userId },
+      order: { createdAt: 'DESC' },
       relations: { products: true, reviews: true },
     });
   }
