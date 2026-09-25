@@ -5,7 +5,10 @@ import { CategoryService } from '../category/category.service.js';
 import { ReviewService } from '../review/review.service.js';
 import { UserService } from '../user/user.service.js';
 import { User } from '../user/entities/user.entity.js';
-import { MonthlySalesDto } from './dto/statistic-response.dto.js';
+import {
+  MainStatisticDto,
+  MonthlySalesDto,
+} from './dto/statistic-response.dto.js';
 
 @Injectable()
 export class StatisticService {
@@ -17,19 +20,14 @@ export class StatisticService {
     private readonly userService: UserService,
   ) {}
 
-  async getMainStatistic(storeId: string) {
+  async getMainStatistic(storeId: string): Promise<MainStatisticDto> {
     const totalRevenue = await this.calculateTotalRevenue(storeId);
     const productsCount = await this.countProducts(storeId);
     const categoriesCount = await this.countCategories(storeId);
 
     const averageRating = await this.calculateAverageRating(storeId);
 
-    return [
-      { id: 1, name: 'Total Revenue', value: totalRevenue },
-      { id: 2, name: 'Products Count', value: productsCount },
-      { id: 3, name: 'Categories Count', value: categoriesCount },
-      { id: 4, name: 'Average Rating', value: averageRating },
-    ];
+    return { totalRevenue, productsCount, categoriesCount, averageRating };
   }
 
   async getMiddleStatistics(storeId: string) {

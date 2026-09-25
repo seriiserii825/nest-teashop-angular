@@ -18,10 +18,9 @@ export class StatisticController {
   @ApiOkResponse({
     description: 'Main statistics.',
     type: MainStatisticDto,
-    isArray: true,
   })
   @Get('main/store/:storeId')
-  async getMainStatistic(@Param('storeId') storeId: string): Promise<MainStatisticDto[]> {
+  async getMainStatistic(@Param('storeId') storeId: string): Promise<MainStatisticDto> {
     return this.statisticService.getMainStatistic(storeId);
   }
 

@@ -2,14 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserDto } from '../../user/dto/user.dto.js';
 
 export class MainStatisticDto {
-  @ApiProperty({ example: 1 })
-  id: number;
+  @ApiProperty({ description: 'Sum of all order totals.', example: 1500 })
+  totalRevenue: number;
 
-  @ApiProperty({ example: 'Total Revenue' })
-  name: string;
+  @ApiProperty({ example: 42 })
+  productsCount: number;
 
-  @ApiProperty({ example: 1500 })
-  value: number;
+  @ApiProperty({ example: 5 })
+  categoriesCount: number;
+
+  @ApiProperty({ description: 'Average review rating.', example: 4.5 })
+  averageRating: number;
 }
 
 export class MonthlySalesDto {
