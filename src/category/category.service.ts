@@ -51,6 +51,9 @@ export class CategoryService {
     return this.categoryRepository.find({
       where: { storeId },
       relations: { store: true },
+      // Без явного order Postgres не гарантирует порядок строк — после UPDATE
+      // строка физически переносится и "уезжает" в другое место скана
+      order: { createdAt: 'DESC', id: 'ASC' },
     });
   }
 

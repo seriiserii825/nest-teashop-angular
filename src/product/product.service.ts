@@ -59,6 +59,9 @@ export class ProductService {
         color: true,
         reviews: true,
       },
+      // Без явного order Postgres не гарантирует порядок строк — после UPDATE
+      // строка физически переносится и "уезжает" в другое место скана
+      order: { createdAt: 'DESC', id: 'ASC' },
     });
   }
 
