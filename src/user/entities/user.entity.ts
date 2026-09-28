@@ -46,7 +46,7 @@ export class User {
   reviews: Relation<Review[]>;
 
   @ApiProperty({ type: () => Product, isArray: true })
-  @ManyToMany(() => Product)
+  @ManyToMany(() => Product, (product) => product.users)
   @JoinTable({ name: 'user_favorites' })
   favorites: Relation<Product[]>;
 

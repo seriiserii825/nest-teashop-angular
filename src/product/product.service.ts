@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, Not, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service.js';
 import { ColorService } from '../color/color.service.js';
+import { MessageResponseDto } from '../common/dto/message-response.dto.js';
 import { FileService } from '../file/file.service.js';
 import { OrderItem } from '../order-item/entities/order-item.entity.js';
 import { StoreService } from '../store/store.service.js';
@@ -184,7 +185,7 @@ export class ProductService {
     userId: string,
     storeId: string,
     productId: string,
-  ): Promise<string> {
+  ): Promise<MessageResponseDto> {
     await this.storeService.findOne(storeId, userId);
 
     const product = await this.productRepository.findOne({
@@ -200,7 +201,7 @@ export class ProductService {
     await Promise.all(
       product.images.map((url) => this.fileService.deleteFileByUrl(url)),
     );
-    return 'Product deleted successfully';
+    return { message: 'Product deleted successfully' };
   }
 
   async countByStoreId(storeId: string): Promise<number> {

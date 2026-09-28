@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { MessageResponseDto } from '../common/dto/message-response.dto.js';
 import { FileResponseDto } from './dto/file-response.dto.js';
 import path from 'app-root-path';
 import fsExtra from 'fs-extra';
@@ -39,7 +40,7 @@ export class FileService {
     return response;
   }
 
-  async deleteFile(folder: string, fileName: string): Promise<string> {
+  async deleteFile(folder: string, fileName: string): Promise<MessageResponseDto> {
     const filePath = `${path.resolve('uploads')}/${folder}/${fileName}`;
     const fileExists = await fsExtra.pathExists(filePath);
     if (!fileExists) {
@@ -48,8 +49,7 @@ export class FileService {
       );
     }
     await fsExtra.remove(filePath);
-    const response = `File ${fileName} deleted successfully from folder ${folder}`;
-    return response;
+    return { message: `File ${fileName} deleted successfully from folder ${folder}` };
   }
 
   // Best-effort удаление по url вида /uploads/{folder}/{fileName} — не падает,

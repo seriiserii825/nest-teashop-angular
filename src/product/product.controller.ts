@@ -20,6 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator.js';
+import { MessageResponseDto } from '../common/dto/message-response.dto.js';
 import { CurrentUser } from '../user/decorators/user.decorator.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
@@ -108,7 +109,7 @@ export class ProductController {
   }
 
   @ApiOperation({ summary: 'Delete a product within a store' })
-  @ApiOkResponse({ description: 'Product deleted successfully.', type: String })
+  @ApiOkResponse({ description: 'Product deleted successfully.', type: MessageResponseDto })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   @ApiBearerAuth()
   @Auth()
@@ -117,7 +118,7 @@ export class ProductController {
     @CurrentUser('id') userId: string,
     @Param('storeId') storeId: string,
     @Param('productId') productId: string,
-  ): Promise<string> {
+  ): Promise<MessageResponseDto> {
     return this.productService.delete(userId, storeId, productId);
   }
 }

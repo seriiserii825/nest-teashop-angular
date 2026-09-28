@@ -19,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Auth } from '../auth/decorators/auth.decorator.js';
+import { MessageResponseDto } from '../common/dto/message-response.dto.js';
 import { FileService } from './file.service.js';
 import { FileResponseDto } from './dto/file-response.dto.js';
 
@@ -66,13 +67,13 @@ export class FileController {
   @ApiOperation({ summary: 'Delete a file from a folder' })
   @ApiQuery({ name: 'folder', required: true })
   @ApiQuery({ name: 'fileName', required: true })
-  @ApiOkResponse({ description: 'File deleted successfully.', type: String })
+  @ApiOkResponse({ description: 'File deleted successfully.', type: MessageResponseDto })
   @HttpCode(200)
   @Delete()
   async deleteFile(
     @Query('folder') folder: string,
     @Query('fileName') fileName: string,
-  ): Promise<string> {
+  ): Promise<MessageResponseDto> {
     return this.fileService.deleteFile(folder, fileName);
   }
 }
