@@ -7,6 +7,7 @@ import { ProductService } from './product.service.js';
 import { StoreModule } from '../store/store.module.js';
 import { CategoryModule } from '../category/category.module.js';
 import { ColorModule } from '../color/color.module.js';
+import { FileModule } from '../file/file.module.js';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ColorModule } from '../color/color.module.js';
     StoreModule,
     CategoryModule,
     ColorModule,
+    FileModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [ProductController],

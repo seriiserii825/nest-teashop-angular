@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, Not, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service.js';
 import { ColorService } from '../color/color.service.js';
+import { FileService } from '../file/file.service.js';
 import { OrderItem } from '../order-item/entities/order-item.entity.js';
 import { StoreService } from '../store/store.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
@@ -21,6 +22,7 @@ export class ProductService {
     private readonly storeService: StoreService,
     private readonly categoryService: CategoryService,
     private readonly colorService: ColorService,
+    private readonly fileService: FileService,
   ) {}
 
   async findAll(searchTerm?: string): Promise<Product[]> {
@@ -195,6 +197,9 @@ export class ProductService {
     }
 
     await this.productRepository.remove(product);
+    await Promise.all(
+      product.images.map((url) => this.fileService.deleteFileByUrl(url)),
+    );
     return 'Product deleted successfully';
   }
 

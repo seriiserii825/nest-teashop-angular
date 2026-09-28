@@ -51,4 +51,15 @@ export class FileService {
     const response = `File ${fileName} deleted successfully from folder ${folder}`;
     return response;
   }
+
+  // Best-effort удаление по url вида /uploads/{folder}/{fileName} — не падает,
+  // если файла уже нет (используется при каскадном удалении, например товара)
+  async deleteFileByUrl(url: string): Promise<void> {
+    const match = url.match(/\/uploads\/([^/]+)\/([^/]+)$/);
+    if (!match) return;
+
+    const [, folder, fileName] = match;
+    const filePath = `${path.resolve('uploads')}/${folder}/${fileName}`;
+    await fsExtra.remove(filePath);
+  }
 }

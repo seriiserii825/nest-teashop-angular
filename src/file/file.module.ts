@@ -9,10 +9,12 @@ import { FileService } from './file.service.js';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: path.resolve('uploads'),
+      serveRoot: '/uploads',
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [FileController],
   providers: [FileService],
+  exports: [FileService],
 })
 export class FileModule {}
