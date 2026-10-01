@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -168,15 +167,6 @@ export class ProductService {
     await this.storeService.findOne(storeId, userId);
     await this.categoryService.getByStoreId(userId, storeId, dto.categoryId);
     await this.colorService.getByStoreId(userId, storeId, dto.colorId);
-
-    const existingProduct = await this.productRepository.findOne({
-      where: { description: dto.description },
-    });
-    if (existingProduct) {
-      throw new BadRequestException(
-        `Product with description "${dto.description}" already exists`,
-      );
-    }
 
     const product = this.productRepository.create({ ...dto, storeId });
     const saved = await this.productRepository.save(product);

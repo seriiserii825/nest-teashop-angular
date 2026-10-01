@@ -29,7 +29,7 @@ export class Product {
   title: string;
 
   @ApiProperty()
-  @Column({ unique: true })
+  @Column()
   description: string;
 
   @ApiProperty()

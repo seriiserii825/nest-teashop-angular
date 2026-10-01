@@ -18,7 +18,7 @@ export class CreateProductDto {
   title: string;
 
   @ApiProperty({
-    description: 'The description of the product (must be unique)',
+    description: 'The description of the product',
     example: 'Loose-leaf green tea from Yunnan.',
   })
   @IsString()

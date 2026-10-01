@@ -10,7 +10,6 @@ import {
   Query,
 } from '@nestjs/common';
 import {
-  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiNotFoundResponse,
@@ -132,9 +131,6 @@ export class ProductController {
   @ApiCreatedResponse({
     description: 'Product created successfully.',
     type: ProductDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'A product with this description already exists.',
   })
   @ApiBearerAuth()
   @Auth()
