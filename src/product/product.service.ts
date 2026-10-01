@@ -12,7 +12,7 @@ import { FileService } from '../file/file.service.js';
 import { OrderItem } from '../order-item/entities/order-item.entity.js';
 import { StoreService } from '../store/store.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
-import { ProductWithRatingDto } from './dto/product-with-rating.dto.js';
+import { ProductDto } from './dto/product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { Product } from './entities/product.entity.js';
 
@@ -27,7 +27,7 @@ export class ProductService {
     private readonly fileService: FileService,
   ) {}
 
-  async findAll(searchTerm?: string): Promise<ProductWithRatingDto[]> {
+  async findAll(searchTerm?: string): Promise<ProductDto[]> {
     if (searchTerm) {
       const filter = this.getBySearchTerm(searchTerm);
       const products = await this.productRepository.find({
@@ -48,7 +48,7 @@ export class ProductService {
     return products.map((product) => this.withRating(product));
   }
 
-  async findLatest(limit = 10): Promise<ProductWithRatingDto[]> {
+  async findLatest(limit = 10): Promise<ProductDto[]> {
     const products = await this.productRepository.find({
       order: { createdAt: 'DESC' },
       take: limit,
@@ -69,7 +69,7 @@ export class ProductService {
     ];
   }
 
-  async findByStoreId(storeId: string): Promise<ProductWithRatingDto[]> {
+  async findByStoreId(storeId: string): Promise<ProductDto[]> {
     const products = await this.productRepository.find({
       where: { store: { id: storeId } },
       relations: {
@@ -85,7 +85,7 @@ export class ProductService {
     return products.map((product) => this.withRating(product));
   }
 
-  async findOne(id: string): Promise<ProductWithRatingDto> {
+  async findOne(id: string): Promise<ProductDto> {
     const product = await this.productRepository.findOne({
       where: { id },
       relations: {
@@ -101,7 +101,7 @@ export class ProductService {
     return this.withRating(product);
   }
 
-  async findByCategoryId(categoryId: string): Promise<ProductWithRatingDto[]> {
+  async findByCategoryId(categoryId: string): Promise<ProductDto[]> {
     const products = await this.productRepository.find({
       where: { category: { id: categoryId } },
       relations: {
@@ -114,7 +114,7 @@ export class ProductService {
     return products.map((product) => this.withRating(product));
   }
 
-  async findByMostPopular(limit = 10): Promise<ProductWithRatingDto[]> {
+  async findByMostPopular(limit = 10): Promise<ProductDto[]> {
     const popular = await this.productRepository.manager
       .createQueryBuilder(OrderItem, 'orderItem')
       .select('orderItem.productId', 'productId')
@@ -141,7 +141,7 @@ export class ProductService {
 
   async findByRelatedCategory(
     productId: string,
-  ): Promise<ProductWithRatingDto[]> {
+  ): Promise<ProductDto[]> {
     const product = await this.productRepository.findOne({
       where: { id: productId },
       relations: { category: true },
@@ -164,7 +164,7 @@ export class ProductService {
     userId: string,
     storeId: string,
     dto: CreateProductDto,
-  ): Promise<Product> {
+  ): Promise<ProductDto> {
     await this.storeService.findOne(storeId, userId);
     await this.categoryService.getByStoreId(userId, storeId, dto.categoryId);
     await this.colorService.getByStoreId(userId, storeId, dto.colorId);
@@ -179,7 +179,9 @@ export class ProductService {
     }
 
     const product = this.productRepository.create({ ...dto, storeId });
-    return this.productRepository.save(product);
+    const saved = await this.productRepository.save(product);
+    // У нового продукта отзывов ещё нет
+    return this.withRating({ ...saved, reviews: [] });
   }
 
   async update(
@@ -187,11 +189,12 @@ export class ProductService {
     storeId: string,
     productId: string,
     dto: UpdateProductDto,
-  ): Promise<Product> {
+  ): Promise<ProductDto> {
     await this.storeService.findOne(storeId, userId);
 
     const product = await this.productRepository.findOne({
       where: { id: productId, storeId },
+      relations: { reviews: true },
     });
     if (!product) {
       throw new NotFoundException(
@@ -207,7 +210,7 @@ export class ProductService {
     }
 
     Object.assign(product, dto);
-    return this.productRepository.save(product);
+    return this.withRating(await this.productRepository.save(product));
   }
 
   async delete(
@@ -234,7 +237,7 @@ export class ProductService {
   }
 
   // Требует загруженной relation `reviews`
-  private withRating(product: Product): ProductWithRatingDto {
+  private withRating(product: Product): ProductDto {
     const reviewsCount = product.reviews.length;
     const rating =
       reviewsCount === 0
