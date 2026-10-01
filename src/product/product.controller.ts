@@ -26,6 +26,7 @@ import { CreateProductDto } from './dto/create-product.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { ProductService } from './product.service.js';
 import { ProductDto } from './dto/product.dto.js';
+import { ProductWithRatingDto } from './dto/product-with-rating.dto.js';
 
 @ApiTags('product')
 @Controller('product')
@@ -38,13 +39,13 @@ export class ProductController {
   @ApiQuery({ name: 'searchTerm', required: false })
   @ApiOkResponse({
     description: 'List of products.',
-    type: ProductDto,
+    type: ProductWithRatingDto,
     isArray: true,
   })
   @Get()
   async findAll(
     @Query('searchTerm') searchTerm?: string,
-  ): Promise<ProductDto[]> {
+  ): Promise<ProductWithRatingDto[]> {
     return this.productService.findAll(searchTerm);
   }
 
@@ -52,13 +53,13 @@ export class ProductController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiOkResponse({
     description: 'List of products.',
-    type: ProductDto,
+    type: ProductWithRatingDto,
     isArray: true,
   })
   @Get('latest')
   async findLatest(
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
-  ): Promise<ProductDto[]> {
+  ): Promise<ProductWithRatingDto[]> {
     return this.productService.findLatest(limit);
   }
 
@@ -66,26 +67,26 @@ export class ProductController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiOkResponse({
     description: 'List of products.',
-    type: ProductDto,
+    type: ProductWithRatingDto,
     isArray: true,
   })
   @Get('most-popular')
   async findByMostPopular(
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
-  ): Promise<ProductDto[]> {
+  ): Promise<ProductWithRatingDto[]> {
     return this.productService.findByMostPopular(limit);
   }
 
   @ApiOperation({ summary: 'List products by category' })
   @ApiOkResponse({
     description: 'List of products.',
-    type: ProductDto,
+    type: ProductWithRatingDto,
     isArray: true,
   })
   @Get('category/:categoryId')
   async findByCategoryId(
     @Param('categoryId') categoryId: string,
-  ): Promise<ProductDto[]> {
+  ): Promise<ProductWithRatingDto[]> {
     return this.productService.findByCategoryId(categoryId);
   }
 
@@ -94,37 +95,37 @@ export class ProductController {
   })
   @ApiOkResponse({
     description: 'List of products.',
-    type: ProductDto,
+    type: ProductWithRatingDto,
     isArray: true,
   })
   @Get('related/:productId')
   async findByRelatedCategory(
     @Param('productId') productId: string,
-  ): Promise<ProductDto[]> {
+  ): Promise<ProductWithRatingDto[]> {
     return this.productService.findByRelatedCategory(productId);
   }
 
   @ApiOperation({ summary: 'List products for a store' })
   @ApiOkResponse({
     description: 'List of products.',
-    type: ProductDto,
+    type: ProductWithRatingDto,
     isArray: true,
   })
   @Get('store/:storeId')
   async findByStoreId(
     @Param('storeId') storeId: string,
-  ): Promise<ProductDto[]> {
+  ): Promise<ProductWithRatingDto[]> {
     return this.productService.findByStoreId(storeId);
   }
 
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiOkResponse({
     description: 'Product found successfully.',
-    type: ProductDto,
+    type: ProductWithRatingDto,
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<ProductDto> {
+  async findOne(@Param('id') id: string): Promise<ProductWithRatingDto> {
     return this.productService.findOne(id);
   }
 

@@ -12,6 +12,7 @@ import { FileService } from '../file/file.service.js';
 import { OrderItem } from '../order-item/entities/order-item.entity.js';
 import { StoreService } from '../store/store.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
+import { ProductWithRatingDto } from './dto/product-with-rating.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { Product } from './entities/product.entity.js';
 
@@ -26,10 +27,10 @@ export class ProductService {
     private readonly fileService: FileService,
   ) {}
 
-  async findAll(searchTerm?: string): Promise<Product[]> {
+  async findAll(searchTerm?: string): Promise<ProductWithRatingDto[]> {
     if (searchTerm) {
       const filter = this.getBySearchTerm(searchTerm);
-      return this.productRepository.find({
+      const products = await this.productRepository.find({
         where: filter,
         order: { createdAt: 'DESC' },
         relations: {
@@ -39,12 +40,16 @@ export class ProductService {
           reviews: true,
         },
       });
+      return products.map((product) => this.withRating(product));
     }
-    return this.productRepository.find();
+    const products = await this.productRepository.find({
+      relations: { reviews: true },
+    });
+    return products.map((product) => this.withRating(product));
   }
 
-  async findLatest(limit = 10): Promise<Product[]> {
-    return this.productRepository.find({
+  async findLatest(limit = 10): Promise<ProductWithRatingDto[]> {
+    const products = await this.productRepository.find({
       order: { createdAt: 'DESC' },
       take: limit,
       relations: {
@@ -54,6 +59,7 @@ export class ProductService {
         reviews: true,
       },
     });
+    return products.map((product) => this.withRating(product));
   }
 
   private getBySearchTerm(searchTerm: string) {
@@ -63,8 +69,8 @@ export class ProductService {
     ];
   }
 
-  findByStoreId(storeId: string): Promise<Product[]> {
-    return this.productRepository.find({
+  async findByStoreId(storeId: string): Promise<ProductWithRatingDto[]> {
+    const products = await this.productRepository.find({
       where: { store: { id: storeId } },
       relations: {
         store: true,
@@ -76,9 +82,10 @@ export class ProductService {
       // строка физически переносится и "уезжает" в другое место скана
       order: { createdAt: 'DESC', id: 'ASC' },
     });
+    return products.map((product) => this.withRating(product));
   }
 
-  async findOne(id: string): Promise<Product> {
+  async findOne(id: string): Promise<ProductWithRatingDto> {
     const product = await this.productRepository.findOne({
       where: { id },
       relations: {
@@ -91,11 +98,11 @@ export class ProductService {
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
-    return product;
+    return this.withRating(product);
   }
 
-  async findByCategoryId(categoryId: string): Promise<Product[]> {
-    return this.productRepository.find({
+  async findByCategoryId(categoryId: string): Promise<ProductWithRatingDto[]> {
+    const products = await this.productRepository.find({
       where: { category: { id: categoryId } },
       relations: {
         store: true,
@@ -104,9 +111,10 @@ export class ProductService {
         reviews: true,
       },
     });
+    return products.map((product) => this.withRating(product));
   }
 
-  async findByMostPopular(limit = 10): Promise<Product[]> {
+  async findByMostPopular(limit = 10): Promise<ProductWithRatingDto[]> {
     const popular = await this.productRepository.manager
       .createQueryBuilder(OrderItem, 'orderItem')
       .select('orderItem.productId', 'productId')
@@ -126,10 +134,14 @@ export class ProductService {
 
     // find() по In() не гарантирует порядок — восстанавливаем по popular
     const order = new Map(productIds.map((id, i) => [id, i]));
-    return products.sort((a, b) => order.get(a.id)! - order.get(b.id)!);
+    return products
+      .sort((a, b) => order.get(a.id)! - order.get(b.id)!)
+      .map((product) => this.withRating(product));
   }
 
-  async findByRelatedCategory(productId: string): Promise<Product[]> {
+  async findByRelatedCategory(
+    productId: string,
+  ): Promise<ProductWithRatingDto[]> {
     const product = await this.productRepository.findOne({
       where: { id: productId },
       relations: { category: true },
@@ -138,13 +150,14 @@ export class ProductService {
       throw new NotFoundException(`Product with ID ${productId} not found`);
     }
 
-    return this.productRepository.find({
+    const products = await this.productRepository.find({
       where: {
         category: { id: product.category.id },
         id: Not(productId),
       },
       relations: { store: true, category: true, color: true, reviews: true },
     });
+    return products.map((product) => this.withRating(product));
   }
 
   async create(
@@ -218,6 +231,17 @@ export class ProductService {
       product.images.map((url) => this.fileService.deleteFileByUrl(url)),
     );
     return { message: 'Product deleted successfully' };
+  }
+
+  // Требует загруженной relation `reviews`
+  private withRating(product: Product): ProductWithRatingDto {
+    const reviewsCount = product.reviews.length;
+    const rating =
+      reviewsCount === 0
+        ? 0
+        : product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+          reviewsCount;
+    return { ...product, rating, reviewsCount };
   }
 
   async countByStoreId(storeId: string): Promise<number> {
