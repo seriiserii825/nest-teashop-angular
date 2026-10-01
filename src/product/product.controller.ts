@@ -55,7 +55,7 @@ export class ProductController {
     type: ProductDto,
     isArray: true,
   })
-  @Get('last-created')
+  @Get('latest')
   async findLatest(
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
   ): Promise<ProductDto[]> {
