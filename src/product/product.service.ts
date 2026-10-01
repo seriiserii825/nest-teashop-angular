@@ -43,7 +43,7 @@ export class ProductService {
     return this.productRepository.find();
   }
 
-  async findLast(limit = 10): Promise<Product[]> {
+  async findLatest(limit = 10): Promise<Product[]> {
     return this.productRepository.find({
       order: { createdAt: 'DESC' },
       take: limit,

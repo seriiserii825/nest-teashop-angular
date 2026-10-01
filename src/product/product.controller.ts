@@ -56,10 +56,10 @@ export class ProductController {
     isArray: true,
   })
   @Get('last-created')
-  async findLast(
+  async findLatest(
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
   ): Promise<ProductDto[]> {
-    return this.productService.findLast(limit);
+    return this.productService.findLatest(limit);
   }
 
   @ApiOperation({ summary: 'List the most popular products' })
