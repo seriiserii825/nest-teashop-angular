@@ -32,17 +32,43 @@ import { ProductDto } from './dto/product.dto.js';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @ApiOperation({ summary: 'List products, optionally filtered by search term' })
+  @ApiOperation({
+    summary: 'List products, optionally filtered by search term',
+  })
   @ApiQuery({ name: 'searchTerm', required: false })
-  @ApiOkResponse({ description: 'List of products.', type: ProductDto, isArray: true })
+  @ApiOkResponse({
+    description: 'List of products.',
+    type: ProductDto,
+    isArray: true,
+  })
   @Get()
-  async findAll(@Query('searchTerm') searchTerm?: string): Promise<ProductDto[]> {
+  async findAll(
+    @Query('searchTerm') searchTerm?: string,
+  ): Promise<ProductDto[]> {
     return this.productService.findAll(searchTerm);
+  }
+
+  @ApiOperation({ summary: 'List the last created products' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiOkResponse({
+    description: 'List of products.',
+    type: ProductDto,
+    isArray: true,
+  })
+  @Get('last-created')
+  async findLast(
+    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
+  ): Promise<ProductDto[]> {
+    return this.productService.findLast(limit);
   }
 
   @ApiOperation({ summary: 'List the most popular products' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiOkResponse({ description: 'List of products.', type: ProductDto, isArray: true })
+  @ApiOkResponse({
+    description: 'List of products.',
+    type: ProductDto,
+    isArray: true,
+  })
   @Get('most-popular')
   async findByMostPopular(
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
@@ -51,28 +77,51 @@ export class ProductController {
   }
 
   @ApiOperation({ summary: 'List products by category' })
-  @ApiOkResponse({ description: 'List of products.', type: ProductDto, isArray: true })
+  @ApiOkResponse({
+    description: 'List of products.',
+    type: ProductDto,
+    isArray: true,
+  })
   @Get('category/:categoryId')
-  async findByCategoryId(@Param('categoryId') categoryId: string): Promise<ProductDto[]> {
+  async findByCategoryId(
+    @Param('categoryId') categoryId: string,
+  ): Promise<ProductDto[]> {
     return this.productService.findByCategoryId(categoryId);
   }
 
-  @ApiOperation({ summary: 'List products related to a product (same category)' })
-  @ApiOkResponse({ description: 'List of products.', type: ProductDto, isArray: true })
+  @ApiOperation({
+    summary: 'List products related to a product (same category)',
+  })
+  @ApiOkResponse({
+    description: 'List of products.',
+    type: ProductDto,
+    isArray: true,
+  })
   @Get('related/:productId')
-  async findByRelatedCategory(@Param('productId') productId: string): Promise<ProductDto[]> {
+  async findByRelatedCategory(
+    @Param('productId') productId: string,
+  ): Promise<ProductDto[]> {
     return this.productService.findByRelatedCategory(productId);
   }
 
   @ApiOperation({ summary: 'List products for a store' })
-  @ApiOkResponse({ description: 'List of products.', type: ProductDto, isArray: true })
+  @ApiOkResponse({
+    description: 'List of products.',
+    type: ProductDto,
+    isArray: true,
+  })
   @Get('store/:storeId')
-  async findByStoreId(@Param('storeId') storeId: string): Promise<ProductDto[]> {
+  async findByStoreId(
+    @Param('storeId') storeId: string,
+  ): Promise<ProductDto[]> {
     return this.productService.findByStoreId(storeId);
   }
 
   @ApiOperation({ summary: 'Get a product by id' })
-  @ApiOkResponse({ description: 'Product found successfully.', type: ProductDto })
+  @ApiOkResponse({
+    description: 'Product found successfully.',
+    type: ProductDto,
+  })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ProductDto> {
@@ -80,8 +129,13 @@ export class ProductController {
   }
 
   @ApiOperation({ summary: 'Create a product for a store' })
-  @ApiCreatedResponse({ description: 'Product created successfully.', type: ProductDto })
-  @ApiBadRequestResponse({ description: 'A product with this description already exists.' })
+  @ApiCreatedResponse({
+    description: 'Product created successfully.',
+    type: ProductDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'A product with this description already exists.',
+  })
   @ApiBearerAuth()
   @Auth()
   @Post('store/:storeId')
@@ -94,7 +148,10 @@ export class ProductController {
   }
 
   @ApiOperation({ summary: 'Update a product within a store' })
-  @ApiOkResponse({ description: 'Product updated successfully.', type: ProductDto })
+  @ApiOkResponse({
+    description: 'Product updated successfully.',
+    type: ProductDto,
+  })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   @ApiBearerAuth()
   @Auth()
@@ -109,7 +166,10 @@ export class ProductController {
   }
 
   @ApiOperation({ summary: 'Delete a product within a store' })
-  @ApiOkResponse({ description: 'Product deleted successfully.', type: MessageResponseDto })
+  @ApiOkResponse({
+    description: 'Product deleted successfully.',
+    type: MessageResponseDto,
+  })
   @ApiNotFoundResponse({ description: 'Product not found.' })
   @ApiBearerAuth()
   @Auth()

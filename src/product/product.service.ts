@@ -43,6 +43,19 @@ export class ProductService {
     return this.productRepository.find();
   }
 
+  async findLast(limit = 10): Promise<Product[]> {
+    return this.productRepository.find({
+      order: { createdAt: 'DESC' },
+      take: limit,
+      relations: {
+        store: true,
+        category: true,
+        color: true,
+        reviews: true,
+      },
+    });
+  }
+
   private getBySearchTerm(searchTerm: string) {
     return [
       { title: ILike(`%${searchTerm}%`) },
