@@ -1,6 +1,7 @@
 import { hash } from 'argon2';
 import { DataSource } from 'typeorm';
 import AppDataSource from '../data-source.js';
+import { slugify } from '../common/utils/slugify.js';
 import { Category } from '../category/entities/category.entity.js';
 import { Color } from '../color/entities/color.entity.js';
 import { Order } from '../order/entities/order.entity.js';
@@ -286,6 +287,7 @@ async function seedStore(
     data.products.map((p) =>
       productRepo.create({
         title: p.title,
+        slug: slugify(p.title),
         description: p.description,
         price: p.price,
         images: [p.image],

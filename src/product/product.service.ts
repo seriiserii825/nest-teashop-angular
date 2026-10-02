@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -7,6 +8,7 @@ import { ILike, In, Not, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service.js';
 import { ColorService } from '../color/color.service.js';
 import { MessageResponseDto } from '../common/dto/message-response.dto.js';
+import { slugify } from '../common/utils/slugify.js';
 import { FileService } from '../file/file.service.js';
 import { OrderItem } from '../order-item/entities/order-item.entity.js';
 import { StoreService } from '../store/store.service.js';
@@ -167,8 +169,10 @@ export class ProductService {
     await this.storeService.findOne(storeId, userId);
     await this.categoryService.getByStoreId(userId, storeId, dto.categoryId);
     await this.colorService.getByStoreId(userId, storeId, dto.colorId);
+    const slug = this.makeSlug(dto.title);
+    await this.assertSlugIsFree(storeId, slug);
 
-    const product = this.productRepository.create({ ...dto, storeId });
+    const product = this.productRepository.create({ ...dto, slug, storeId });
     const saved = await this.productRepository.save(product);
     // У нового продукта отзывов ещё нет
     return this.withRating({ ...saved, reviews: [] });
@@ -198,6 +202,13 @@ export class ProductService {
     if (dto.colorId) {
       await this.colorService.getByStoreId(userId, storeId, dto.colorId);
     }
+    if (dto.title) {
+      const slug = this.makeSlug(dto.title);
+      if (slug !== product.slug) {
+        await this.assertSlugIsFree(storeId, slug);
+        product.slug = slug;
+      }
+    }
 
     Object.assign(product, dto);
     return this.withRating(await this.productRepository.save(product));
@@ -224,6 +235,27 @@ export class ProductService {
       product.images.map((url) => this.fileService.deleteFileByUrl(url)),
     );
     return { message: 'Product deleted successfully' };
+  }
+
+  private makeSlug(title: string): string {
+    const slug = slugify(title);
+    if (!slug) {
+      throw new BadRequestException(
+        `Cannot build slug from title "${title}": it must contain latin letters or digits`,
+      );
+    }
+    return slug;
+  }
+
+  private async assertSlugIsFree(storeId: string, slug: string) {
+    const exists = await this.productRepository.exists({
+      where: { storeId, slug },
+    });
+    if (exists) {
+      throw new BadRequestException(
+        `Product with slug ${slug} already exists for this store`,
+      );
+    }
   }
 
   // Требует загруженной relation `reviews`
