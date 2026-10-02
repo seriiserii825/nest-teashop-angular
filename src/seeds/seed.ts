@@ -47,7 +47,6 @@ const COLORS: Record<string, string> = {
   Gray: '#9e9e9e',
   Brown: '#795548',
   Gold: '#c9a227',
-  Green: '#43a047',
 };
 
 const CDN = 'https://cdn.dummyjson.com/product-images';
@@ -213,100 +212,6 @@ const STORE_BY_USER: StoreSeed[] = [
       },
     ],
   },
-  {
-    title: 'Buyer Street Style',
-    description: 'Streetwear, sneakers and summer looks',
-    categories: [
-      'Shirts',
-      'Dresses',
-      'Sneakers',
-      "Women's Shoes",
-      'Sunglasses',
-    ],
-    colors: ['Black', 'White', 'Red', 'Blue', 'Green', 'Gray'],
-    products: [
-      {
-        title: 'Gigabyte Aorus Men Tshirt',
-        description: 'Casual gaming tee with the Aorus logo',
-        price: 1990,
-        image: `${CDN}/mens-shirts/gigabyte-aorus-men-tshirt/1.webp`,
-        category: 'Shirts',
-        color: 'Black',
-      },
-      {
-        title: 'Man Short Sleeve Shirt',
-        description: 'Breezy short sleeve shirt for warm days',
-        price: 2490,
-        image: `${CDN}/mens-shirts/man-short-sleeve-shirt/1.webp`,
-        category: 'Shirts',
-        color: 'Blue',
-      },
-      {
-        title: 'Tartan Dress',
-        description: 'Classic tartan pattern for fall and winter',
-        price: 5490,
-        image: `${CDN}/tops/tartan-dress/1.webp`,
-        category: 'Dresses',
-        color: 'Red',
-      },
-      {
-        title: 'Girl Summer Dress',
-        description: 'Light and breezy dress for hot summer days',
-        price: 3790,
-        image: `${CDN}/tops/girl-summer-dress/1.webp`,
-        category: 'Dresses',
-        color: 'Green',
-      },
-      {
-        title: 'Sports Sneakers Off White Red',
-        description: 'Comfortable off-white sneakers for casual wear',
-        price: 7490,
-        image: `${CDN}/mens-shoes/sports-sneakers-off-white-red/1.webp`,
-        category: 'Sneakers',
-        color: 'White',
-      },
-      {
-        title: 'Nike Baseball Cleats',
-        description: 'Cleats with maximum traction on the field',
-        price: 9990,
-        image: `${CDN}/mens-shoes/nike-baseball-cleats/1.webp`,
-        category: 'Sneakers',
-        color: 'Black',
-      },
-      {
-        title: 'Red Shoes',
-        description: 'Vibrant red shoes that make a statement',
-        price: 6990,
-        image: `${CDN}/womens-shoes/red-shoes/1.webp`,
-        category: "Women's Shoes",
-        color: 'Red',
-      },
-      {
-        title: 'Pampi Shoes',
-        description: 'Comfortable everyday shoes with a trendy look',
-        price: 4990,
-        image: `${CDN}/womens-shoes/pampi-shoes/1.webp`,
-        category: "Women's Shoes",
-        color: 'White',
-      },
-      {
-        title: 'Green and Black Glasses',
-        description: 'Eye-catching green and black frame',
-        price: 2290,
-        image: `${CDN}/sunglasses/green-and-black-glasses/1.webp`,
-        category: 'Sunglasses',
-        color: 'Green',
-      },
-      {
-        title: 'Party Glasses',
-        description: 'Playful frames to add flair to any party',
-        price: 1490,
-        image: `${CDN}/sunglasses/party-glasses/1.webp`,
-        category: 'Sunglasses',
-        color: 'Blue',
-      },
-    ],
-  },
 ];
 
 const REVIEW_TEXTS: { text: string; rating: number }[] = [
@@ -337,7 +242,6 @@ async function seedUsers(dataSource: DataSource) {
   return repo.save([
     repo.create({ name: 'Serii', email: 'seriiburduja@gmail.com', password }),
     repo.create({ name: 'Nixon', email: 'nixon@gmail.com', password }),
-    repo.create({ name: 'Buyer', email: 'buyer@example.com', password }),
   ]);
 }
 
