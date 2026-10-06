@@ -127,18 +127,15 @@ export class ProductController {
     return this.productService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Get a product by slug for a store' })
+  @ApiOperation({ summary: 'Get a product by slug' })
   @ApiOkResponse({
     description: 'Product found successfully.',
     type: ProductDto,
   })
   @ApiNotFoundResponse({ description: 'Product not found.' })
-  @Get('store/:storeId/:slug')
-  async findBySlug(
-    @Param('storeId') storeId: string,
-    @Param('slug') slug: string,
-  ): Promise<ProductDto> {
-    return this.productService.findBySlug(storeId, slug);
+  @Get('slug/:slug')
+  async findBySlug(@Param('slug') slug: string): Promise<ProductDto> {
+    return this.productService.findBySlug(slug);
   }
 
   @ApiOperation({ summary: 'Create a product for a store' })

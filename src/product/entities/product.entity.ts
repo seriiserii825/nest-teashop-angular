@@ -21,7 +21,8 @@ import { Store } from '../../store/entities/store.entity.js';
 import { User } from '../../user/entities/user.entity.js';
 
 @Entity('products')
-@Unique(['storeId', 'slug'])
+@Unique(['slug'])
+@Unique(['storeId', 'title'])
 @Check(`"slug" ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`)
 export class Product {
   @ApiProperty()

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, In, Not, Repository } from 'typeorm';
+import { ILike, In, Like, Not, Repository } from 'typeorm';
 import { CategoryService } from '../category/category.service.js';
 import { ColorService } from '../color/color.service.js';
 import { MessageResponseDto } from '../common/dto/message-response.dto.js';
@@ -102,9 +102,9 @@ export class ProductService {
     return this.withRating(product);
   }
 
-  async findBySlug(storeId: string, slug: string): Promise<ProductDto> {
+  async findBySlug(slug: string): Promise<ProductDto> {
     const product = await this.productRepository.findOne({
-      where: { storeId, slug },
+      where: { slug },
       relations: {
         store: true,
         category: true,
@@ -113,9 +113,7 @@ export class ProductService {
       },
     });
     if (!product) {
-      throw new NotFoundException(
-        `Product with slug ${slug} not found for store ${storeId}`,
-      );
+      throw new NotFoundException(`Product with slug ${slug} not found`);
     }
     return this.withRating(product);
   }
@@ -185,8 +183,8 @@ export class ProductService {
     await this.storeService.findOne(storeId, userId);
     await this.categoryService.getByStoreId(userId, storeId, dto.categoryId);
     await this.colorService.getByStoreId(userId, storeId, dto.colorId);
-    const slug = this.makeSlug(dto.title);
-    await this.assertSlugIsFree(storeId, slug);
+    await this.assertTitleIsFree(storeId, dto.title);
+    const slug = await this.makeUniqueSlug(dto.title);
 
     const product = this.productRepository.create({ ...dto, slug, storeId });
     const saved = await this.productRepository.save(product);
@@ -218,12 +216,12 @@ export class ProductService {
     if (dto.colorId) {
       await this.colorService.getByStoreId(userId, storeId, dto.colorId);
     }
-    if (dto.title) {
-      const slug = this.makeSlug(dto.title);
-      if (slug !== product.slug) {
-        await this.assertSlugIsFree(storeId, slug);
-        product.slug = slug;
-      }
+    if (dto.title && dto.title !== product.title) {
+      await this.assertTitleIsFree(storeId, dto.title);
+    }
+    // Если slug уже построен из того же title (в т.ч. с суффиксом) — не трогаем, чтобы не ломать ссылки
+    if (dto.title && !this.slugMatchesBase(product.slug, this.makeSlug(dto.title))) {
+      product.slug = await this.makeUniqueSlug(dto.title);
     }
 
     Object.assign(product, dto);
@@ -263,15 +261,38 @@ export class ProductService {
     return slug;
   }
 
-  private async assertSlugIsFree(storeId: string, slug: string) {
+  private async assertTitleIsFree(storeId: string, title: string) {
     const exists = await this.productRepository.exists({
-      where: { storeId, slug },
+      where: { storeId, title },
     });
     if (exists) {
       throw new BadRequestException(
-        `Product with slug ${slug} already exists for this store`,
+        `Product with title ${title} already exists for this store`,
       );
     }
+  }
+
+  // slug уникален на весь маркетплейс: green-tea, green-tea-2, green-tea-3, ...
+  private async makeUniqueSlug(title: string): Promise<string> {
+    const base = this.makeSlug(title);
+    const taken = await this.productRepository.find({
+      select: { slug: true },
+      where: [{ slug: base }, { slug: Like(`${base}-%`) }],
+    });
+    if (!taken.some((p) => p.slug === base)) return base;
+
+    const maxSuffix = taken.reduce((max, { slug }) => {
+      const suffix = this.slugMatchesBase(slug, base)
+        ? Number(slug.slice(base.length + 1) || 1)
+        : 1;
+      return Math.max(max, suffix);
+    }, 1);
+    return `${base}-${maxSuffix + 1}`;
+  }
+
+  // "green-tea" и "green-tea-3" подходят под base "green-tea", а "green-tea-premium" — нет
+  private slugMatchesBase(slug: string, base: string): boolean {
+    return new RegExp(`^${base}(-\\d+)?$`).test(slug);
   }
 
   // Требует загруженной relation `reviews`
