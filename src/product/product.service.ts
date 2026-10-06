@@ -102,6 +102,24 @@ export class ProductService {
     return this.withRating(product);
   }
 
+  async findBySlug(storeId: string, slug: string): Promise<ProductDto> {
+    const product = await this.productRepository.findOne({
+      where: { storeId, slug },
+      relations: {
+        store: true,
+        category: true,
+        color: true,
+        reviews: true,
+      },
+    });
+    if (!product) {
+      throw new NotFoundException(
+        `Product with slug ${slug} not found for store ${storeId}`,
+      );
+    }
+    return this.withRating(product);
+  }
+
   async findByCategoryId(categoryId: string): Promise<ProductDto[]> {
     const products = await this.productRepository.find({
       where: { category: { id: categoryId } },
@@ -140,9 +158,7 @@ export class ProductService {
       .map((product) => this.withRating(product));
   }
 
-  async findByRelatedCategory(
-    productId: string,
-  ): Promise<ProductDto[]> {
+  async findByRelatedCategory(productId: string): Promise<ProductDto[]> {
     const product = await this.productRepository.findOne({
       where: { id: productId },
       relations: { category: true },
