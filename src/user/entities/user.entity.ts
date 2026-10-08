@@ -14,6 +14,7 @@ import { Order } from '../../order/entities/order.entity.js';
 import { Product } from '../../product/entities/product.entity.js';
 import { Review } from '../../review/entities/review.entity.js';
 import { Store } from '../../store/entities/store.entity.js';
+import { UserRole } from '../enums/user-role.enum.js';
 
 @Entity('users')
 export class User {
@@ -32,6 +33,10 @@ export class User {
   @ApiProperty()
   @Column({ default: '/uploads/no-user-image.jpg' })
   picture: string;
+
+  @ApiProperty({ enum: UserRole })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
 
   @ApiHideProperty()
   @Column({ type: 'varchar', nullable: true, select: false })

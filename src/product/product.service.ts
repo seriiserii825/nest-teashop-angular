@@ -57,7 +57,7 @@ export class ProductService {
         store: true,
         category: true,
         color: true,
-        reviews: true,
+        reviews: { user: true },
       },
     });
     return products.map((product) => this.withRating(product));
@@ -77,7 +77,7 @@ export class ProductService {
         store: true,
         category: true,
         color: true,
-        reviews: true,
+        reviews: { user: true },
       },
       // Без явного order Postgres не гарантирует порядок строк — после UPDATE
       // строка физически переносится и "уезжает" в другое место скана
@@ -93,7 +93,7 @@ export class ProductService {
         store: true,
         category: true,
         color: true,
-        reviews: true,
+        reviews: { user: true },
       },
     });
     if (!product) {
@@ -109,7 +109,7 @@ export class ProductService {
         store: true,
         category: true,
         color: true,
-        reviews: true,
+        reviews: { user: true },
       },
     });
     if (!product) {
@@ -125,7 +125,7 @@ export class ProductService {
         store: true,
         category: true,
         color: true,
-        reviews: true,
+        reviews: { user: true },
       },
     });
     return products.map((product) => this.withRating(product));
