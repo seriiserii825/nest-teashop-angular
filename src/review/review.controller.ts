@@ -49,19 +49,18 @@ export class ReviewController {
     return this.reviewService.findOne(id, storeId, userId);
   }
 
-  @ApiOperation({ summary: 'Create a review for a product in a store' })
+  @ApiOperation({ summary: 'Create a review for a product' })
   @ApiCreatedResponse({ description: 'Review created successfully.', type: ReviewDto })
-  @ApiNotFoundResponse({ description: 'Product not found for this store.' })
+  @ApiNotFoundResponse({ description: 'Product not found.' })
   @ApiBearerAuth()
   @Auth()
-  @Post('product/:productId/store/:storeId')
+  @Post('product/:productId')
   async create(
     @Body() dto: CreateReviewDto,
     @CurrentUser('id') userId: string,
     @Param('productId') productId: string,
-    @Param('storeId') storeId: string,
   ): Promise<ReviewDto> {
-    return this.reviewService.create(dto, userId, productId, storeId);
+    return this.reviewService.create(dto, userId, productId);
   }
 
   @ApiOperation({ summary: 'Update a review within a store' })
