@@ -63,12 +63,20 @@ export class UserService {
       .getOne();
   }
 
-  update(id: string, updateUserDto: UpdateUserDto): string {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.findOne(id);
+    const { password, ...rest } = updateUserDto;
+    await this.userRepository.update(id, {
+      ...rest,
+      ...(password ? { password: await hash(password) } : {}),
+    });
+    return this.findOne(id);
   }
 
-  remove(id: string): string {
-    return `This action removes a #${id} user`;
+  async remove(id: string): Promise<{ message: string }> {
+    await this.findOne(id);
+    await this.userRepository.delete(id);
+    return { message: `User with id ${id} deleted successfully` };
   }
 
   async toggleFavoriteProduct(

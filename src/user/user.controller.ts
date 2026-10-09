@@ -92,12 +92,18 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Update a user' })
+  @ApiOkResponse({ description: 'The updated user.', type: UserDto })
+  @ApiNotFoundResponse({ description: 'User not found.' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserDto> {
     return this.userService.update(id, updateUserDto);
   }
 
   @ApiOperation({ summary: 'Delete a user' })
+  @ApiNotFoundResponse({ description: 'User not found.' })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);

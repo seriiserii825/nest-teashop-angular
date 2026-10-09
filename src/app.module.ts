@@ -13,6 +13,7 @@ import { OrderItemModule } from './order-item/order-item.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { FileModule } from './file/file.module.js';
 import { StatisticModule } from './statistic/statistic.module.js';
+import { CartModule } from './cart/cart.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -33,6 +34,7 @@ import { StatisticModule } from './statistic/statistic.module.js';
     AuthModule,
     FileModule,
     StatisticModule,
+    CartModule,
   ],
 })
 export class AppModule {}
